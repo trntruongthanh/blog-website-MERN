@@ -1,43 +1,43 @@
-import mongoose, { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 
-const commentSchema = mongoose.Schema({
-    
+const commentSchema = new Schema(
+  {
     blog_id: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: 'blogs'
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Blog",
     },
     blog_author: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: 'blogs',
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Blog",
     },
     comment: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     children: {
-        type: [Schema.Types.ObjectId],
-        ref: 'comments'
+      type: [Schema.Types.ObjectId],
+      ref: "Comment",
     },
     commented_by: {
-        type: Schema.Types.ObjectId,
-        require: true,
-        ref: 'users'
+      type: Schema.Types.ObjectId,
+      require: true,
+      ref: "User",
     },
     isReply: {
-        type: Boolean,
+      type: Boolean,
     },
     parent: {
-        type: Schema.Types.ObjectId,
-        ref: 'comments'
-    }
-
-},
-{
+      type: Schema.Types.ObjectId,
+      ref: "Comment",
+    },
+  },
+  {
     timestamps: {
-        createdAt: 'commentedAt'
-    }
-})
+      createdAt: "commentedAt",
+    },
+  }
+);
 
-export default mongoose.model("comments", commentSchema)
+export default model("Comment", commentSchema);
