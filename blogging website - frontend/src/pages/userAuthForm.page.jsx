@@ -1,28 +1,111 @@
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+
+import { useContext, useRef } from "react";
+import { UserContext } from "../App";
+
+import { Toaster, toast } from "react-hot-toast";
+import axios from "axios";
 
 import images from "../assets/imgs/imgs";
 import InputBox from "../components/input.component";
 import AnimationWrapper from "../common/page-animation";
 
+import { storeInSession } from "../common/session";
+
 const UserAuthForm = ({ type }) => {
-  return (
+  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+
+  const authForm = useRef();
+
+  /*
+    userAuth: { access_token } → Lấy access_token từ userAuth.
+    setUserAuth → Lấy hàm cập nhật trạng thái người dùng.
+  */
+  let {
+    userAuth: { access_token },
+    setUserAuth,
+  } = useContext(UserContext);
+
+
+  const userAuthThroughServer = async (serverRoute, formData) => {
+    try {
+      const response = await axios.post(
+        import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
+        formData
+      );
+
+      storeInSession("user", response.data); // chuyển đổi đối tượng thành chuỗi. Lưu vào session storage
+
+      setUserAuth(response.data);     // Cập nhật context
+    } catch (error) {
+      toast.error(error.response.data.error);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    let serverRoute = type === "sign-in" ? "/signin" : "/signup";
+
+    /*
+    FormData là một đối tượng JavaScript giúp thu thập dữ liệu từ <form>.
+    Nó tự động lấy tất cả các input fields (text, email, password, file, v.v.) trong form mà không cần truy cập từng phần tử riêng lẻ.
+    Thường dùng khi muốn gửi dữ liệu lên server bằng fetch() hoặc axios.
+    
+    entries() là một phương thức giúp lấy danh sách cặp key-value từ một số kiểu dữ liệu như Object, Array, Map, FormData...
+    Nó trả về một iterator (bộ lặp), cho phép duyệt qua từng phần tử bằng for...of.
+
+    Duyệt qua tất cả dữ liệu trong FormData và chuyển nó thành một object JavaScript.
+    */
+    let form = new FormData(formElement);
+
+    let formData = {};
+
+    for (let [key, value] of form.entries()) {
+      formData[key] = value;
+    }
+
+    const { fullname, email, password } = formData;
+
+    if (fullname && fullname.length < 3) {
+      return toast.error("Fullname must be at least 3 letters long.");
+    }
+
+    // Form Validation
+    if (!email.length || !emailRegex.test(email)) {
+      return toast.error("Email is invalid");
+    }
+
+    if (!passwordRegex.test(password)) {
+      return toast.error(
+        "Password should be 6 to 20 characters long with a numeric, 1 lowercase and 1 uppercase letter."
+      );
+    }
+
+    userAuthThroughServer(serverRoute, formData);
+  };
+
+  return access_token ? (
+    <Navigate to="/" />
+  ) : (
     <AnimationWrapper keyValue={type}>
       <section className="h-cover flex items-center ">
-        <form className="w-[80%] max-w-[400px]">
+        <Toaster />
+
+        <form ref={authForm} id="formElement" className="w-[80%] max-w-[400px]">
           <h1 className="text-4xl font-gelasio capitalize text-center mb-24">
             {type === "sign-in" ? "Welcome back" : "Join us today"}
           </h1>
 
-          {type !== "sign-in" ? (
+          {type !== "sign-in" && (
             <InputBox
               name="fullname"
               type="text"
               placeholder="Full name"
               icon="user"
             />
-          ) : (
-            ""
           )}
 
           <InputBox
@@ -39,7 +122,11 @@ const UserAuthForm = ({ type }) => {
             icon="password"
           />
 
-          <button type="submit" className="btn-dark center mt-14">
+          <button
+            onClick={handleSubmit}
+            type="submit"
+            className="btn-dark center mt-14"
+          >
             {type.replace("-", " ")}
           </button>
 

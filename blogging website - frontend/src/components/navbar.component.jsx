@@ -1,17 +1,38 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 
+import { UserContext } from "../App";
+
 import images from "../assets/imgs/imgs";
-import { FileEditIcon } from "../Icons";
+import { BellIcon, FileEditIcon } from "../Icons";
+
+import Button from "./Button";
+import UserNavigationPanel from "./user-navigation.component";
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
+  const [userNavPanel, setUserNavPanel] = useState(false);
+
+  const {
+    userAuth,
+    userAuth: { access_token, profile_img },
+  } = useContext(UserContext);
 
   // Handle Search box (min-width: 768px)
   const handleToggleSearchBoxVisibility = () => {
-    setSearchBoxVisibility(!searchBoxVisibility);       // Đảo ngược trạng thái hiển thị mật khẩu
+    setSearchBoxVisibility(!searchBoxVisibility); // Đảo ngược trạng thái hiển thị mật khẩu
   };
 
+  const handleUserNavPanel = () => {
+    setUserNavPanel((current) => !current);
+  };
+
+  // setTimeout giúp đảm bảo người dùng có thể click vào mục trong menu trước khi nó bị ẩn đi. 
+  const handleBlur = () => {
+    setTimeout(() => {
+      setUserNavPanel(false);
+    }, 200);
+  };
 
   return (
     <>
@@ -24,7 +45,7 @@ const Navbar = () => {
         {/*INPUT */}
         <div
           className={
-            "absolute bg-white w-full left-0 top-full mt-0.5 border-b border-grey py-4 px-[5vw] md:bottom-0 md:block md:relative md:inset-0 md:p-0 md:w-auto md:show " +
+            "absolute bg-white w-full left-0 top-full mt-0.5 border-b border-grey py-4 px-[5vw] md:bottom-0 md:block md:relative md:inset-0 md:p-0 md:w-auto " +
             (searchBoxVisibility ? "show" : "hide")
           }
         >
@@ -50,13 +71,40 @@ const Navbar = () => {
             <p>Write</p>
           </Link>
 
-          <Link className="btn-dark py-2" to="/signin">
-            Sign In
-          </Link>
+          {access_token ? (
+            <>
+              <Link to="/dashboard/notification">
+                <Button className="w-12 h-12 rounded-full flex items-center justify-center bg-grey relative hover:bg-black/10">
+                  <BellIcon className="text-xl block mt-1" />
+                </Button>
+              </Link>
 
-          <Link className="btn-light py-2 hidden md:block" to="/signup">
-            Sign up
-          </Link>
+              <div
+                onClick={handleUserNavPanel}
+                onBlur={handleBlur}
+                className="relative"
+              >
+                <button className="w-12 h-12 mt-1">
+                  <img
+                    src={profile_img}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </button>
+
+                {userNavPanel && <UserNavigationPanel />}
+              </div>
+            </>
+          ) : (
+            <>
+              <Link className="btn-dark py-2" to="/signin">
+                Sign In
+              </Link>
+
+              <Link className="btn-light py-2 hidden md:block" to="/signup">
+                Sign up
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 

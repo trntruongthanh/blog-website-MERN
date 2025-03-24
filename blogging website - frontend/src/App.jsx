@@ -1,4 +1,7 @@
 import { Routes, Route } from "react-router-dom";
+import { createContext, useEffect, useState } from "react";
+
+import { lookInSession } from "./common/session";
 
 import Navbar from "./components/navbar.component";
 import UserAuthForm from "./pages/userAuthForm.page";
@@ -13,14 +16,39 @@ import UserAuthForm from "./pages/userAuthForm.page";
   Vì Navbar được dùng làm layout cha, nên các route con (signin và signup) sẽ được hiển thị bên trong nó.
 */
 
+export const UserContext = createContext({});
+
 const App = () => {
+
+  /*
+  lookInSession("user") kiểm tra xem có dữ liệu người dùng trong session storage không.
+  */
+  const [userAuth, setUserAuth] = useState({});
+
+  useEffect(() => {
+    let userInSession = lookInSession("user");
+
+    userInSession
+      ? setUserAuth(JSON.parse(userInSession))
+      : setUserAuth({ access_token: null });
+  }, []);
+
+  const value = {
+    userAuth,
+    setUserAuth,
+  };
+
+  // console.log(userAuth)
+
   return (
-    <Routes>
-      <Route path="/" element={<Navbar />}>
-        <Route path="signin" element={<UserAuthForm type="sign-in" />} />
-        <Route path="signup" element={<UserAuthForm type="sign-up" />} />
-      </Route>
-    </Routes>
+    <UserContext.Provider value={value}>
+      <Routes>
+        <Route path="/" element={<Navbar />}>
+          <Route path="signin" element={<UserAuthForm type="sign-in" />} />
+          <Route path="signup" element={<UserAuthForm type="sign-up" />} />
+        </Route>
+      </Routes>
+    </UserContext.Provider>
   );
 };
 

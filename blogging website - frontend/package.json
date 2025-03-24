@@ -23,6 +23,7 @@
     "@flaticon/flaticon-uicons": "^2.2.0",
     "@tailwindcss/postcss": "^4.0.9",
     "axios": "^1.4.0",
+    "clsx": "^2.1.1",
     "firebase": "^10.1.0",
     "framer-motion": "^10.13.0",
     "react": "^18.2.0",

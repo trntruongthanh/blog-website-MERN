@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import jwt from "jsonwebtoken";
+import cors from "cors";
 
 import User from "./Schema/User.js";
 
@@ -55,7 +56,8 @@ let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 const isProduction = process.env.NODE_ENV === "production";
 
-server.use(express.json()); // Bắt buộc để đọc JSON từ request body (middleware)
+server.use(express.json());   // Bắt buộc để đọc JSON từ request body (middleware)
+server.use(cors());
 
 //============================================================================================
 (async () => {

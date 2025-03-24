@@ -45,7 +45,6 @@ const InputBox = ({ name, type, id, value, placeholder, icon }) => {
 InputBox.propTypes = {
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
   value: PropTypes.string,
   placeholder: PropTypes.string.isRequired,
   icon: PropTypes.oneOf(Object.keys(ICONS)), // Chỉ chấp nhận các key trong ICONS

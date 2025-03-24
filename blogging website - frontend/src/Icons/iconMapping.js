@@ -1,4 +1,4 @@
-import { UserIcon, FileEditIcon, EmailIcon, PasswordIcon, HideEyeIcon, ShowEyeIcon } from "./icon";
+import { UserIcon, FileEditIcon, EmailIcon, PasswordIcon, HideEyeIcon, ShowEyeIcon, BellIcon } from "./icon";
 
 export const ICONS = {
   user: UserIcon,
@@ -7,4 +7,5 @@ export const ICONS = {
   password: PasswordIcon,
   hideEyeIcon: HideEyeIcon,
   showEyeIcon: ShowEyeIcon,
+  bellIcon: BellIcon,
 };
