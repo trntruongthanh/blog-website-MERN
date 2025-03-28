@@ -24,7 +24,7 @@
     "@tailwindcss/postcss": "^4.0.9",
     "axios": "^1.4.0",
     "clsx": "^2.1.1",
-    "firebase": "^10.1.0",
+    "firebase": "^11.5.0",
     "framer-motion": "^10.13.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

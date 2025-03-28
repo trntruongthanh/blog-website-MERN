@@ -12,6 +12,7 @@ import InputBox from "../components/input.component";
 import AnimationWrapper from "../common/page-animation";
 
 import { storeInSession } from "../common/session";
+import { authWithGoogle } from "../common/firebase";
 
 const UserAuthForm = ({ type }) => {
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -36,9 +37,11 @@ const UserAuthForm = ({ type }) => {
         formData
       );
 
-      storeInSession("user", response.data); // chuyển đổi đối tượng thành chuỗi. Lưu vào session storage
+      // console.log("Server response:", response.data);
 
-      setUserAuth(response.data);     // Cập nhật context
+      storeInSession("user", response.data);    // chuyển đổi đối tượng thành chuỗi. Lưu vào session storage
+
+      setUserAuth(response.data);               // Cập nhật context
     } catch (error) {
       toast.error(error.response.data.error);
     }
@@ -59,6 +62,7 @@ const UserAuthForm = ({ type }) => {
 
     Duyệt qua tất cả dữ liệu trong FormData và chuyển nó thành một object JavaScript.
     */
+
     let form = new FormData(formElement);
 
     let formData = {};
@@ -86,6 +90,39 @@ const UserAuthForm = ({ type }) => {
 
     userAuthThroughServer(serverRoute, formData);
   };
+
+
+  //=======================================================================================
+  const handleGoogleAuth = async (e) => {
+    try {
+      e.preventDefault();
+
+      const user = await authWithGoogle();
+
+      if (!user) {
+        toast.error("Google authentication failed.");
+        return;
+      }
+
+      // Lấy Firebase ID Token từ người dùng
+      const firebaseIdToken = await user.getIdToken();      // Sử dụng Firebase ID token thay vì Google OAuth token
+      
+      // console.log("Firebase ID token", firebaseIdToken);
+
+      let serverRoute = "/google-auth";
+
+      let formData = {
+        access_token: firebaseIdToken,
+      };
+
+      userAuthThroughServer(serverRoute, formData);
+    } catch (error) {
+
+      toast.error("Trouble login through Google.");
+      return console.log(error);
+    }
+  };
+
 
   return access_token ? (
     <Navigate to="/" />
@@ -136,7 +173,10 @@ const UserAuthForm = ({ type }) => {
             <hr className="w-1/2 border-black" />
           </div>
 
-          <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
+          <button
+            onClick={handleGoogleAuth}
+            className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+          >
             <img src={images.google} className="w-5" />
             continue with google
           </button>

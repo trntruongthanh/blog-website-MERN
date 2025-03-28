@@ -3,11 +3,21 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { nanoid } from "nanoid";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 
+import { nanoid } from "nanoid";
+
+import admin from "firebase-admin";
+import { getAuth } from "firebase-admin/auth";
+
 import User from "./Schema/User.js";
+
+import { readFileSync } from "fs";
+
+const serviceAccount = JSON.parse(
+  readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf-8")
+);
 
 /*
   bcrypt: Hash password để bảo mật.
@@ -51,12 +61,16 @@ import User from "./Schema/User.js";
 const server = express();
 const PORT = process.env.PORT || 5000;
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 const isProduction = process.env.NODE_ENV === "production";
 
-server.use(express.json());   // Bắt buộc để đọc JSON từ request body (middleware)
+server.use(express.json()); // Bắt buộc để đọc JSON từ request body (middleware)
 server.use(cors());
 
 //============================================================================================
@@ -67,7 +81,6 @@ server.use(cors());
     });
     console.log("Connected to MongoDB ✅");
   } catch (error) {
-
     // Nếu cần tự động kết nối lại, có thể thêm cơ chế retry ở đây
     setTimeout(() => {
       console.log("Retrying MongoDB connection...");
@@ -78,7 +91,6 @@ server.use(cors());
         .catch((err) => console.error("MongoDB retry failed:", err));
     }, 5000);
   }
-
 })();
 
 //==============================================================================================================
@@ -179,9 +191,7 @@ server.post("/signup", async (req, res) => {
     const savedUser = await user.save();
 
     return res.status(200).json(formatDataSend(savedUser));
-
   } catch (err) {
-
     // 📌 Kiểm tra lỗi trùng email
     if (err.code === 11000) {
       return res.status(500).json({ error: "Email already exists" });
@@ -203,16 +213,98 @@ server.post("/signin", async (req, res) => {
       return res.status(403).json({ error: "Email not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.personal_info.password);
+    if (!user.google_auth) {
+      const isMatch = await bcrypt.compare(
+        password,
+        user.personal_info.password
+      );
 
-    if (!isMatch) {
-      return res.status(403).json({ error: "Incorrect password." });
+      if (!isMatch) {
+        return res.status(403).json({ error: "Incorrect password." });
+      }
+      return res.status(200).json(formatDataSend(user));
+    } else {
+      return res
+        .status(403)
+        .json({
+          error:
+            "Account was created using Google. Try logging in with Google.",
+        });
     }
-
-    return res.status(200).json(formatDataSend(user));
   } catch (error) {
     console.error("Error in /signin:", error.message);
     return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ====================================================================================
+/**
+getAuth():
+Lấy module xác thực (auth) của Firebase Admin SDK.
+Điều này giúp sử dụng các chức năng xác thực của Firebase trên server.
+
+.verifyIdToken(access_token):
+Xác minh token ID (access_token) mà client gửi lên.
+
+Ảnh đại diện (picture) được đổi kích thước từ "s96-c" → "s384-c" (chất lượng cao hơn).
+*/
+server.post("/google-auth", async (req, res) => {
+  try {
+    let { access_token } = req.body;
+
+    if (!access_token) {
+      return res.status(400).json({ error: "Missing access_token" });
+    }
+
+    // Xác minh và giải mã token Google
+    const decodedUser = await getAuth().verifyIdToken(access_token);
+
+    // Trích xuất thông tin từ token
+    let { email, name, picture } = decodedUser;
+    picture = picture.replace("s96-c", "s384-c");
+
+    // Kiểm tra xem user đã tồn tại trong database hay chưa
+    let user;
+    try {
+      user = await User.findOne({ "personal_info.email": email }).select(
+        "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
+      );
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    // Nếu user đã tồn tại
+    if (user) {
+      if (!user.google_auth) {
+        return res.status(403).json({
+          error:
+            "This email was signed up without Google. Please log in with a password to access the account.",
+        });
+      }
+    } else {
+      // Nếu chưa tồn tại, tạo user mới
+      const username = await generateUsername(email);
+
+      user = new User({
+        personal_info: {
+          fullname: name,
+          email,
+          username,
+        },
+        google_auth: true,
+      });
+
+      try {
+        user = await user.save();
+      } catch (err) {
+        return res.status(500).json({ error: err.message });
+      }
+    }
+
+    return res.status(200).json(formatDataSend(user));
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 

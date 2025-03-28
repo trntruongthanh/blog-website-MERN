@@ -56,8 +56,22 @@ const userSchema = new Schema(
       },
       profile_img: {
         type: String,
+
+        /*
+        default: Nếu người dùng không cung cấp ảnh đại diện, hệ thống sẽ tự động tạo một ảnh đại diện ngẫu nhiên bằng DiceBear API. 
+        
+        Math.random() tạo số ngẫu nhiên trong khoảng 0 → 1.
+        Math.random() * profile_imgs_collections_list.length lấy số ngẫu nhiên từ 0 đến số lượng phần tử trong mảng.
+        Math.floor(...) làm tròn xuống để lấy một chỉ mục hợp lệ trong mảng.
+        Math.floor(0.7 * 3) = Math.floor(2.1) = 2
+
+        Cách DiceBear API hoạt động:
+        https://api.dicebear.com/6.x/{collection}/svg?seed={name}
+        {collection}: Bộ sưu tập (ví dụ: "fun-emoji")
+        {name}: Tên hình đại diện (ví dụ: "Angel")
+        */
         default: () => {
-          return `https://api.dicebear.com/6.x/${
+          return `https://api.dicebear.com/9.x/${
             profile_imgs_collections_list[
               Math.floor(Math.random() * profile_imgs_collections_list.length)
             ]
