@@ -5,6 +5,7 @@ import { lookInSession } from "./common/session";
 
 import Navbar from "./components/navbar.component";
 import UserAuthForm from "./pages/userAuthForm.page";
+import Editor from "./pages/editor.pages";
 
 /*
   Điểm cần lưu ý
@@ -19,7 +20,6 @@ import UserAuthForm from "./pages/userAuthForm.page";
 export const UserContext = createContext({});
 
 const App = () => {
-
   /*
   lookInSession("user") kiểm tra xem có dữ liệu người dùng trong session storage không.
   */
@@ -43,6 +43,8 @@ const App = () => {
   return (
     <UserContext.Provider value={value}>
       <Routes>
+        <Route path="/editor" element={<Editor />} />
+
         <Route path="/" element={<Navbar />}>
           <Route path="signin" element={<UserAuthForm type="sign-in" />} />
           <Route path="signup" element={<UserAuthForm type="sign-up" />} />

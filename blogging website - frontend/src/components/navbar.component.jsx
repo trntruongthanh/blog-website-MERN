@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 
 import { UserContext } from "../App";
 
-import images from "../assets/imgs/imgs";
+import images from "../assets/imgs/images";
 import { BellIcon, FileEditIcon } from "../Icons";
 
 import Button from "./Button";

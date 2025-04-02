@@ -1,24 +1,3 @@
-import "dotenv/config";
-
-import express from "express";
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import cors from "cors";
-
-import { nanoid } from "nanoid";
-
-import admin from "firebase-admin";
-import { getAuth } from "firebase-admin/auth";
-
-import User from "./Schema/User.js";
-
-import { readFileSync } from "fs";
-
-const serviceAccount = JSON.parse(
-  readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf-8")
-);
-
 /*
   bcrypt: Hash password để bảo mật.
   nanoid: Tạo username ngẫu nhiên nếu cần.
@@ -58,12 +37,44 @@ const serviceAccount = JSON.parse(
   Nếu lỗi, log error và dừng server (process.exit(1)).
 */
 
+import "dotenv/config";
+
+import express from "express";
+import cors from "cors";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+import { nanoid } from "nanoid";
+
+import mongoose from "mongoose";
+import admin from "firebase-admin";
+import { getAuth } from "firebase-admin/auth";
+import { v2 as cloudinary } from "cloudinary";
+
+import User from "./Schema/User.js";
+
+import { readFileSync } from "fs";
+
+//==============================================================================================
+
+const serviceAccount = JSON.parse(
+  readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf-8")
+);
+
 const server = express();
 const PORT = process.env.PORT || 5000;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET_KEY,
+});
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
+//============================================================================================
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
@@ -93,38 +104,44 @@ server.use(cors());
   }
 })();
 
-//==============================================================================================================
-/*
-  access_token quan trọng để xác thực mà không cần gửi lại mật khẩu.
-  Nếu thêm thời gian hết hạn (expiresIn), token sẽ luôn khác nhau mỗi lần tạo: { expiresIn: "1h" }
-  Cấu trúc của access_token khi sử dụng JWT:
+//===============================================================================================
 
-  xxxxx.yyyyy.zzzzz
-  Gồm 3 phần: 1️⃣ Header: Chứa thông tin về thuật toán mã hóa (ví dụ: HMAC SHA256).
-  2️⃣ Payload: Chứa dữ liệu (ví dụ: id của user).
-  3️⃣ Signature: Ký số bằng SECRET_ACCESS_KEY để bảo mật.
+const generateUploadURL = () => {
+  const date = new Date();
+  const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
 
-  Mỗi lần tạo token mới, payload gần như giống nhau (vì user ID không đổi), nhưng signature sẽ thay đổi theo thời gian tạo token ➝ nhìn thì có vẻ "ngẫu nhiên", nhưng thực chất tuân theo thuật toán mã hóa.
-  Ai cũng có thể giải mã được payload nếu có token.
-  Nhưng không ai có thể sửa đổi token vì signature được bảo vệ bằng SECRET_ACCESS_KEY.
+  const timestamp = Math.round(date.getTime() / 1000);
+  const paramsToSign = { timestamp, public_id: imageName };
 
+  const signature = cloudinary.utils.api_sign_request(
+    paramsToSign,
+    process.env.CLOUDINARY_API_SECRET_KEY
+  );
 
-  Lấy phần trước @ trong email: Nếu email là "nguyenvana@example.com", username sẽ là "nguyenvana"
-  User.exists(...) kiểm tra trong database xem có user nào đã dùng username này chưa.
-  Nếu username chưa tồn tại, nó sẽ giữ nguyên.
-  Nếu username đã tồn tại, nó sẽ tạo một username mới.
-  Thêm chuỗi ngẫu nhiên nếu bị trùng
-  nanoid() tạo ra một chuỗi ngẫu nhiên.
-  substring(0, 5) lấy 5 ký tự đầu tiên của chuỗi ngẫu nhiên.
-  Nếu "nguyenvana" đã tồn tại, có thể trở thành "nguyenvanaAb1x9".
-*/
+  return {
+    url: `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_NAME}/image/upload`,
+    timestamp,
+    signature,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    public_id: imageName,
+  };
+};
 
-const formatDataSend = (user) => ({
-  access_token: jwt.sign({ id: user._id }, process.env.SECRET_ACCESS_KEY),
-  profile_img: user.personal_info.profile_img,
-  username: user.personal_info.username,
-  fullname: user.personal_info.fullname,
-});
+//==============================================================================================
+
+const formatDataSend = (user) => {
+  const access_token = jwt.sign(
+    { id: user._id },
+    process.env.SECRET_ACCESS_KEY
+  );
+
+  return {
+    access_token,
+    profile_img: user.personal_info.profile_img,
+    username: user.personal_info.username,
+    fullname: user.personal_info.fullname,
+  };
+};
 
 const generateUsername = async (email) => {
   // if (!email.includes("@")) throw new Error("Invalid email format");
@@ -222,14 +239,12 @@ server.post("/signin", async (req, res) => {
       if (!isMatch) {
         return res.status(403).json({ error: "Incorrect password." });
       }
+
       return res.status(200).json(formatDataSend(user));
     } else {
-      return res
-        .status(403)
-        .json({
-          error:
-            "Account was created using Google. Try logging in with Google.",
-        });
+      return res.status(403).json({
+        error: "Account was created using Google. Try logging in with Google.",
+      });
     }
   } catch (error) {
     console.error("Error in /signin:", error.message);
@@ -265,6 +280,7 @@ server.post("/google-auth", async (req, res) => {
 
     // Kiểm tra xem user đã tồn tại trong database hay chưa
     let user;
+    
     try {
       user = await User.findOne({ "personal_info.email": email }).select(
         "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
@@ -308,6 +324,21 @@ server.post("/google-auth", async (req, res) => {
   }
 });
 
+// ==============================================================================
+server.get("/get-upload-url", async (req, res) => {
+  try {
+    const uploadData = generateUploadURL();
+
+    return res.status(200).json(uploadData);
+
+  } catch (error) {
+    
+    console.log(error.message);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// =======================================================================================
 server.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}.`);
 });

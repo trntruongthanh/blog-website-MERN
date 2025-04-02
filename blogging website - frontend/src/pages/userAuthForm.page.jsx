@@ -7,7 +7,7 @@ import { UserContext } from "../App";
 import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
 
-import images from "../assets/imgs/imgs";
+import images from "../assets/imgs/images";
 import InputBox from "../components/input.component";
 import AnimationWrapper from "../common/page-animation";
 
@@ -47,6 +47,7 @@ const UserAuthForm = ({ type }) => {
     }
   };
 
+  // ======================================================================================
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -128,7 +129,7 @@ const UserAuthForm = ({ type }) => {
     <Navigate to="/" />
   ) : (
     <AnimationWrapper keyValue={type}>
-      <section className="h-cover flex items-center ">
+      <section className="h-cover flex items-center justify-center ">
         <Toaster />
 
         <form ref={authForm} id="formElement" className="w-[80%] max-w-[400px]">
