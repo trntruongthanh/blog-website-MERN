@@ -17,6 +17,7 @@ export const uploadImage = async (img) => {
     formData.append("api_key", api_key);
     formData.append("public_id", public_id);
 
+    // headers: { "Content-Type": "multipart/form-data" } giúp trình duyệt biết đây là dữ liệu dạng multipart.
     const cloudinaryResponse = await axios.post(url, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
