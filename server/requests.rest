@@ -1,9 +1,29 @@
-# POST http://localhost:3000/signin 
+#   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Zjc3NjUzODQ3ZmI1Y2M2MDFjMDJhMSIsImlhdCI6MTc0NDI3MDkzMX0.6eIlXI8mnm2R6QfR2ZaZqd_q4GHqNnw88N9C7iQ3a8s",
+
+# POST http://localhost:3000/signup
 # Content-Type: application/json
 
 # {
-#     "email": "trntruongthanh@gmail.com",
-#     "password": "Thanhtran123"
+#     "fullname": "Khoa Tran",
+#     "email": "trnvankhoa1@gmail.com",
+#     "password": "Trankhoa123"
 # }
 
-GET http://localhost:3000/get-upload-url 
+
+# GET http://localhost:3000/get-upload-url 
+
+
+POST http://localhost:3000/create-blog
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Zjc3NjUzODQ3ZmI1Y2M2MDFjMDJhMSIsImlhdCI6MTc0NDI3MDkzMX0.6eIlXI8mnm2R6QfR2ZaZqd_q4GHqNnw88N9C7iQ3a8s
+
+{
+    "title": "test title @ 3 134 # 4$",
+    "banner": "http://example.com/image-url",
+    "des": "this is a short",
+    "content": {
+        "blocks": [1, 2]
+    },
+    "tags": ["tags 1", "tags 2", "tags 3"]
+}
+

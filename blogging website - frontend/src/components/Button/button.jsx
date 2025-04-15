@@ -14,10 +14,10 @@ const Button = ({
       onClick={onClick}
       disabled={disabled}
       className={clsx(
-        className, 
-        "px-4 py-2 font-medium transition duration-200",
-        "hover:bg-blue-600 active:bg-blue-700",
-        "disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className,
+        "font-medium transition duration-200 ease-in-out",
+        { "hover:bg-lavender active:bg-lavender": !disabled },
+        { "disabled:bg-gray-300 disabled:cursor-not-allowed": disabled }
       )}
     >
       {children}

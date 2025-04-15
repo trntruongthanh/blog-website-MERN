@@ -1,4 +1,13 @@
-import { UserIcon, FileEditIcon, EmailIcon, PasswordIcon, HideEyeIcon, ShowEyeIcon, BellIcon } from "./icon";
+import {
+  UserIcon,
+  FileEditIcon,
+  EmailIcon,
+  PasswordIcon,
+  HideEyeIcon,
+  ShowEyeIcon,
+  BellIcon,
+  CrossMallIcon,
+} from "./icon";
 
 export const ICONS = {
   user: UserIcon,
@@ -8,4 +17,5 @@ export const ICONS = {
   hideEyeIcon: HideEyeIcon,
   showEyeIcon: ShowEyeIcon,
   bellIcon: BellIcon,
+  CrossMallIcon: CrossMallIcon,
 };

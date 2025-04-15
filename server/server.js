@@ -35,6 +35,12 @@
   true trong development (tự động tạo index).
   false trong production (tránh ảnh hưởng hiệu suất, cần chạy User.syncIndexes() thủ công).
   Nếu lỗi, log error và dừng server (process.exit(1)).
+
+  Hành động	Cần token không?
+👤 Liên quan đến cá nhân	✅ Có
+🌍 Công khai, ai cũng xem được	❌ Không
+📝 Tạo / sửa / xóa dữ liệu	✅ Có
+🔍 Chỉ xem, không cá nhân hóa	❌ Không
 */
 
 import "dotenv/config";
@@ -52,10 +58,9 @@ import { getAuth } from "firebase-admin/auth";
 import { v2 as cloudinary } from "cloudinary";
 
 import User from "./Schema/User.js";
+import Blog from "./Schema/Blog.js";
 
 import { readFileSync } from "fs";
-
-//==============================================================================================
 
 const serviceAccount = JSON.parse(
   readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf-8")
@@ -63,6 +68,8 @@ const serviceAccount = JSON.parse(
 
 const server = express();
 const PORT = process.env.PORT || 5000;
+
+//==============================================================================================
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -152,6 +159,50 @@ const generateUsername = async (email) => {
     username += nanoid().substring(0, 5);
   }
   return username;
+};
+
+//======================================================================================================
+
+/* bảo vệ các route riêng tư (protected routes)
+  next() là một hàm callback có sẵn trong middleware. Khi bạn gọi nó, Express sẽ:
+  Chuyển sang middleware tiếp theo trong chuỗi hoặc
+  Chuyển đến route xử lý cuối cùng (nơi bạn gửi response).
+*/
+const verifyJWT = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "No access token" });
+  }
+
+  jwt.verify(token, process.env.SECRET_ACCESS_KEY, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: "Access token is invalid" });
+    }
+
+    req.user = user.id;
+
+    next();
+  });
+};
+
+//=====================================================================================
+
+/*
+  .toLowerCase() giúp đồng bộ URL (chuẩn SEO).
+  /[^a-z0-9]+/g: loại bỏ ký tự đặc biệt, giữ lại chữ thường & số.
+  .replace(/^-+|-+$/g, ""): xoá dấu - dư ở hai đầu.
+  nanoid() thêm phần ngẫu nhiên để tránh trùng slug 
+*/
+const slugify = (title) => {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return `${slug}-${nanoid()}`;
 };
 
 //===========================================================================================================
@@ -280,7 +331,7 @@ server.post("/google-auth", async (req, res) => {
 
     // Kiểm tra xem user đã tồn tại trong database hay chưa
     let user;
-    
+
     try {
       user = await User.findOne({ "personal_info.email": email }).select(
         "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
@@ -330,11 +381,117 @@ server.get("/get-upload-url", async (req, res) => {
     const uploadData = generateUploadURL();
 
     return res.status(200).json(uploadData);
-
   } catch (error) {
-    
     console.log(error.message);
     return res.status(500).json({ error: error.message });
+  }
+});
+
+//======================================================================================
+// middleware verifyJWT
+server.post("/create-blog", verifyJWT, async (req, res) => {
+  let authorId = req.user;
+
+  let { title, des, banner, tags, content, draft } = req.body;
+
+  // ================= Validation ===================
+
+  if (!title.length) {
+    return res
+      .status(403)
+      .json({ error: "You must provide a title" });
+  }
+
+  if (!draft) {
+
+    if (!des.length || des.length > 200) {
+      return res.status(403).json({
+        error: "You must provide blog description under 200 characters",
+      });
+    }
+
+    if (!banner.length) {
+      return res
+        .status(403)
+        .json({ error: "You must provide blog banner to publish it" });
+    }
+
+    if (!content.blocks.length) {
+      return res
+        .status(403)
+        .json({ error: "There must be some blog content to publish it" });
+    }
+
+    if (!tags.length || tags.length > 10) {
+      return res
+        .status(403)
+        .json({
+          error: "Provide tags in order to publish the blog, Maximum 10",
+        });
+    }
+  }
+
+  // ================== Xử lý ===================
+
+  // Chuyển tất cả tag thành chữ thường để đồng nhất.
+  tags = tags.map((tag) => tag.toLowerCase());
+
+  /*
+    Tạo blog_id duy nhất:
+    1.Thay mọi ký tự không phải chữ cái hay số thành khoảng trắng.
+    2.Chuyển mọi khoảng trắng (kể cả nhiều khoảng trắng liên tục) thành dấu gạch ngang -
+    3. Xoá khoảng trắng thừa ở đầu và cuối chuỗi.
+    Thêm chuỗi ngẫu nhiên (nanoid) để đảm bảo uniqueness.
+
+    let blog_id =
+      title
+        .replace(/[^a-zA-Z0-9]/g, " ")
+        .replace(/\s+/g, "-")
+        .trim() + nanoid();
+  */
+
+  let blog_id = slugify(title);
+
+  let blog = new Blog({
+    title,
+    banner,
+    des,
+    tags,
+    content,
+    blog_id,
+    author: authorId,
+    draft: Boolean(draft),
+  });
+
+  /*
+    Nếu là bản nháp (draft), không tăng số lượng bài viết. Nếu là bài thật, tăng 1 vào account_info.total_posts.
+    
+    $inc và $push là toán tử (operator) mặc định của MongoDB
+    $inc	Increment (Tăng số)	Tăng giá trị một field kiểu số lên một lượng nhất định
+    $push	Push vào mảng	Thêm một phần tử vào mảng hiện có trong document
+  */
+  try {
+    const savedBlog = await blog.save();
+
+    const incrementValue = draft ? 0 : 1;
+
+    try {
+      await User.findOneAndUpdate(
+        { _id: authorId },
+        {
+          $inc: { "account_info.total_posts": incrementValue },
+          $push: { blogs: savedBlog._id },
+        }
+      );
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ error: "Failed to update total posts number" });
+    }
+
+    return res.status(200).json({ id: savedBlog.blog_id });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to create blog" });
   }
 });
 
