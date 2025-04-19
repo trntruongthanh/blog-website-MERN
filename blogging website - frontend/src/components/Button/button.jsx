@@ -1,15 +1,13 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import clsx from "clsx";
 
-const Button = ({
-  children,
-  className,
-  onClick,
-  type = "button",
-  disabled = false,
-}) => {
+const Button = forwardRef(function Button(
+  { children, className, onClick, type = "button", disabled = false },
+  ref
+) {
   return (
     <button
+      ref={ref}
       type={type}
       onClick={onClick}
       disabled={disabled}
@@ -23,6 +21,6 @@ const Button = ({
       {children}
     </button>
   );
-};
+});
 
 export default Button;

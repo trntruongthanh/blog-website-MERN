@@ -5,6 +5,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+    sm	≥ 640px	điện thoại lớn / tablet đứng
+    md	≥ 768px	tablet nằm ngang / laptop nhỏ
+    lg	≥ 1024px	laptop lớn
+    xl	≥ 1280px	desktop
+    2xl	≥ 1536px	màn cực lớn
+*/
+
+
 /*=========================== Global Styles (@layer components) ===========================*/
 @layer components {
     * {

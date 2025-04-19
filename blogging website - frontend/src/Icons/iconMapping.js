@@ -7,6 +7,7 @@ import {
   ShowEyeIcon,
   BellIcon,
   CrossMallIcon,
+  LikeIcon,
 } from "./icon";
 
 export const ICONS = {
@@ -17,5 +18,6 @@ export const ICONS = {
   hideEyeIcon: HideEyeIcon,
   showEyeIcon: ShowEyeIcon,
   bellIcon: BellIcon,
-  CrossMallIcon: CrossMallIcon,
+  crossMallIcon: CrossMallIcon,
+  likeIcon: LikeIcon,
 };

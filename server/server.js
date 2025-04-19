@@ -51,6 +51,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { nanoid } from "nanoid";
+import { slugify as translitSlugify } from "transliteration";
 
 import mongoose from "mongoose";
 import admin from "firebase-admin";
@@ -197,12 +198,16 @@ const verifyJWT = (req, res, next) => {
   nanoid() thêm phần ngẫu nhiên để tránh trùng slug 
 */
 const slugify = (title) => {
-  const slug = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  // Sử dụng transliteration để chuyển đổi tiêu đề sang dạng không dấu
+  const cleanTitle = translitSlugify(title);
 
-  return `${slug}-${nanoid()}`;
+  // Xử lý phần slug
+  const slug = cleanTitle
+    .toLowerCase() // Chuyển về chữ thường
+    .replace(/[^a-z0-9]+/g, "-") // Thay thế các ký tự không phải chữ cái và số thành dấu "-"
+    .replace(/^-+|-+$/g, ""); // Loại bỏ dấu "-" thừa ở đầu và cuối
+
+  return `${slug}-${nanoid(5)}`; // Thêm nanoid vào cuối slug
 };
 
 //===========================================================================================================
@@ -388,6 +393,55 @@ server.get("/get-upload-url", async (req, res) => {
 });
 
 //======================================================================================
+/*
+  .populate() là một tính năng mạnh mẽ của Mongoose (thư viện ORM cho MongoDB), dùng để tự động "join" dữ liệu từ các collection liên quan, tương tự như JOIN trong SQL.
+  .sort(): 1	Tăng dần (ascending)	từ nhỏ → lớn, từ cũ → mới, từ A → Z
+  -1	Giảm dần (descending)	từ lớn → nhỏ, từ mới → cũ, từ Z → A
+*/
+
+server.get("/latest-blogs", async (req, res) => {
+  try {
+    const maxLimit = 5;
+
+    const blogs = await Blog.find({ draft: false })
+      .populate(
+        "author", // Đối số thứ nhất: tên field chứa ObjectId tham chiếu đến collection khác
+        "personal_info.profile_img personal_info.username personal_info.fullname -_id" // Đối số thứ hai: chỉ định các trường cần lấy từ document được populate
+      )
+      .sort({ publishedAt: -1 })
+      .select("blog_id title des banner activity tags publishedAt -_id")
+      .limit(maxLimit);
+
+    return res.status(200).json({ blogs });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+server.get("/trending-blogs", async (req, res) => {
+  try {
+    const maxLimit = 5;
+
+    const blogs = await Blog.find({ draft: false })
+      .populate(
+        "author",
+        "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+      )
+      .sort({
+        "activity.total_reads": -1,
+        "activity.total_likes": -1,
+        publishedAt: -1,
+      })
+      .select("blog_id title publishedAt -_id")
+      .limit(maxLimit);
+
+    return res.status(200).json({ blogs });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//======================================================================================
 // middleware verifyJWT
 server.post("/create-blog", verifyJWT, async (req, res) => {
   let authorId = req.user;
@@ -397,13 +451,10 @@ server.post("/create-blog", verifyJWT, async (req, res) => {
   // ================= Validation ===================
 
   if (!title.length) {
-    return res
-      .status(403)
-      .json({ error: "You must provide a title" });
+    return res.status(403).json({ error: "You must provide a title" });
   }
 
   if (!draft) {
-
     if (!des.length || des.length > 200) {
       return res.status(403).json({
         error: "You must provide blog description under 200 characters",
@@ -423,11 +474,9 @@ server.post("/create-blog", verifyJWT, async (req, res) => {
     }
 
     if (!tags.length || tags.length > 10) {
-      return res
-        .status(403)
-        .json({
-          error: "Provide tags in order to publish the blog, Maximum 10",
-        });
+      return res.status(403).json({
+        error: "Provide tags in order to publish the blog, Maximum 10",
+      });
     }
   }
 

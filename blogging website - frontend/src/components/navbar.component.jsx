@@ -42,6 +42,8 @@ const Navbar = () => {
           <img src={images.logo} className="w-full" />
         </Link>
 
+        <p className="p-4 m-[-20px] text-nowrap">Touch Decor</p>
+
         {/*INPUT */}
         <div
           className={

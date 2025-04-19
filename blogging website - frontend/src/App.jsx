@@ -6,6 +6,7 @@ import { lookInSession } from "./common/session";
 import Navbar from "./components/navbar.component";
 import UserAuthForm from "./pages/userAuthForm.page";
 import Editor from "./pages/editor.pages";
+import HomePage from "./pages/home.page";
 
 /*
   Điểm cần lưu ý
@@ -40,12 +41,18 @@ const App = () => {
 
   // console.log(userAuth)
 
+  /*
+    index là cú pháp mới trong React Router v6 để khai báo route con mặc định của một layout cha.
+    Bắt buộc phải có <Outlet /> trong Navbar để route con hiển thị đúng.
+  */
+
   return (
     <UserContext.Provider value={value}>
       <Routes>
         <Route path="/editor" element={<Editor />} />
 
         <Route path="/" element={<Navbar />}>
+          <Route index element={<HomePage />} />
           <Route path="signin" element={<UserAuthForm type="sign-in" />} />
           <Route path="signup" element={<UserAuthForm type="sign-up" />} />
         </Route>
