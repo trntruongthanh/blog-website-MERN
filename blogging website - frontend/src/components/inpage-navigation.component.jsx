@@ -16,9 +16,8 @@ const InPageNavigation = ({
   defaultActiveIndex = 0,
   children,
 }) => {
-
-  const activeTabLineRef = useRef();
-  const activeTabRef = useRef();
+  let activeTabLineRef = useRef();
+  let activeTabRef = useRef();
 
   const [inPageNavIndex, setInPageNavIndex] = useState(defaultActiveIndex);
 
@@ -41,14 +40,17 @@ const InPageNavigation = ({
   };
 
   useEffect(() => {
-    changPageState(activeTabRef.current, defaultActiveIndex);
-  }, []);
+    if (activeTabRef.current) {
+      changPageState(activeTabRef.current, inPageNavIndex);
+    }
+  }, [routes]);
 
   //========================================================================================
 
   /*
     React ngầm hiểu rằng bạn đang truyền nhiều phần tử con (children) vào InPageNavigation. Và khi có nhiều phần tử cùng cấp, React sẽ tự gom chúng thành một mảng.
     {Array.isArray(children) ? children[inPageNavIndex] : children}
+    Dòng ref={index === defaultActiveIndex ? activeTabRef : null} chỉ có tác dụng lúc component render, để gán ref cho tab mặc định (thường là tab đầu tiên).
   */
 
   return (
@@ -57,7 +59,7 @@ const InPageNavigation = ({
         {routes.map((route, index) => {
           return (
             <Button
-              onClick={(event) => changPageState(event.target, index)}
+              onClick={(event) => changPageState(event.currentTarget, index)}
               ref={index === defaultActiveIndex ? activeTabRef : null}
               key={index}
               className={
@@ -71,8 +73,10 @@ const InPageNavigation = ({
           );
         })}
 
-        <hr ref={activeTabLineRef} className="absolute bottom-0 duration-400" />
-
+        <hr
+          ref={activeTabLineRef}
+          className="absolute bottom-0 h-[2px] bg-black transition-all duration-300"
+        />
       </div>
 
       {Array.isArray(children) ? children[inPageNavIndex] : children}

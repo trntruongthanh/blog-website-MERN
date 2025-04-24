@@ -8,6 +8,7 @@ import {
   BellIcon,
   CrossMallIcon,
   LikeIcon,
+  ArrowUpIcon,
 } from "./icon";
 
 export const ICONS = {
@@ -20,4 +21,5 @@ export const ICONS = {
   bellIcon: BellIcon,
   crossMallIcon: CrossMallIcon,
   likeIcon: LikeIcon,
+  arrowUpIcon: ArrowUpIcon,
 };

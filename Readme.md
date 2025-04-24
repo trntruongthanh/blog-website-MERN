@@ -1,68 +1,46 @@
-# Fullstack MERN Blogging Website
+# 📝 Blog Website - MERN Stack
 
-let emailRegex = /^\w+([\.-]?\w+)_@\w+([\.-]?\w+)_(\.\w{2,3})+$/; // regex for email
-let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
+> A full-featured blogging platform built with the MERN stack (MongoDB, Express.js, React, Node.js).
 
-# Đây trong file server kiểm tra đã kết nối DB
-Dễ dàng bắt lỗi kết nối (error).
-Biết khi MongoDB bị mất kết nối (disconnected).
-Log rõ ràng khi kết nối thành công (connected).
+![GitHub repo size](https://img.shields.io/github/repo-size/trntruongthanh/blog-website-MERN)
+![GitHub license](https://img.shields.io/github/license/trntruongthanh/blog-website-MERN)
+![GitHub last commit](https://img.shields.io/github/last-commit/trntruongthanh/blog-website-MERN)
 
-    const db = mongoose.connection;
+---
 
-    db.on("connected", () => {
-    console.log("✅ MongoDB connected successfully!");
-    });
+## 🚀 Features
 
-    db.on("error", (err) => {
-    console.error("❌ MongoDB connection error:", err);
-    });
+- ✍️ Rich text blog editor with image upload
+- 👤 User authentication (Google Sign-In support)
+- 🔐 Secure blog posting and editing (JWT-based)
+- 🔍 Blog browsing with category filtering
+- 💬 Comments and user interactions
+- 🌐 Responsive UI, modern UX
 
-    db.on("disconnected", () => {
-    console.warn("⚠️ MongoDB disconnected!");
-    });
+---
 
-    (async () => {
-    await connectDB();
+## 🛠️ Tech Stack
 
-        server.listen(PORT, () => {
-        console.log(`🚀 Server is running on port ${PORT}`);
-    });
-    })();
+- **Frontend**: React.js, Tailwind CSS
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (with Mongoose)
+- **Auth**: Firebase Authentication, JWT
+- **Image Hosting**: Cloudinary
+- **Deployment**: Vercel / Render / Railway
 
-============================================================================================
+---
 
-Mã lỗi HTTP (Status Codes)
-Mã thành công (2xx)
-200 OK Request thành công, server trả về dữ liệu.
-201 Created Dữ liệu đã được tạo thành công (thường dùng khi đăng ký tài khoản, tạo bài viết mới, v.v.).
-204 No Content Request thành công nhưng không có dữ liệu trả về.
+## 📦 Installation
 
-Mã lỗi Client (4xx)
-400 Bad Request Request bị lỗi (gửi sai định dạng JSON, thiếu tham số, v.v.).
-401 Unauthorized Thiếu hoặc sai access_token, yêu cầu xác thực nhưng không cung cấp token hợp lệ.
-403 Forbidden Truy cập bị từ chối (đúng token nhưng không có quyền).
-404 Not Found Không tìm thấy tài nguyên (ví dụ: ID người dùng không tồn tại).
-409 Conflict Xung đột dữ liệu (ví dụ: đăng ký tài khoản với email đã tồn tại).
+```bash
+# Clone the repo
+git clone git@github.com:trntruongthanh/blog-website-MERN.git
+cd blog-website-MERN
 
-500 Internal Server Error Lỗi phía server (thường là do code backend bị lỗi).
-502 Bad Gateway Server nhận phản hồi không hợp lệ từ một server khác (thường do lỗi proxy, load balancer).
-503 Service Unavailable Server đang bảo trì hoặc quá tải.
-504 Gateway Timeout Request bị timeout khi gọi đến một dịch vụ khác.
+# Install server dependencies
+cd server
+npm install
 
-Mã lỗi MongoDB (Mongoose Errors)
-11000 Duplicate Key Lỗi trùng dữ liệu, thường gặp khi email hoặc username đã tồn tại trong database và đang cố insert thêm một bản ghi giống hệt.
-66 Immutable Field Cố gắng cập nhật một trường không thể thay đổi (ví dụ: \_id).
-121 Document Validation Failed Dữ liệu không hợp lệ do vi phạm schema (ví dụ: nhập số âm vào trường chỉ chấp nhận số dương).
-50 Exceeded Time Limit Query chạy quá lâu, MongoDB tự động dừng để tránh quá tải.
-
-============================================================================================
-FILE request.rest
-Content-Type	                            Cách gửi dữ liệu	        Middleware cần thiết
-application/json	                        { "name": "A" }	            express.json()
-application/x-www-form-urlencoded	        name=A&age=20	            express.urlencoded({ extended: true })
-multipart/form-data	Upload file	multer
-
-
-📌 Ví dụ dùng express.urlencoded() để nhận dữ liệu từ form HTML
-server.use(express.urlencoded({ extended: true }));
+# Install client dependencies
+cd ../client
+npm install

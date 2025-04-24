@@ -41,6 +41,10 @@
 🌍 Công khai, ai cũng xem được	❌ Không
 📝 Tạo / sửa / xóa dữ liệu	✅ Có
 🔍 Chỉ xem, không cá nhân hóa	❌ Không
+
+
+Dùng findOne() khi bạn chỉ cần một document duy nhất.
+Dùng find() khi bạn cần nhiều document (danh sách, bảng, lọc, phân trang...). Trả về user đầu tiên tên Alice (nếu có)
 */
 
 import "dotenv/config";
@@ -190,7 +194,6 @@ const verifyJWT = (req, res, next) => {
 };
 
 //=====================================================================================
-
 /*
   .toLowerCase() giúp đồng bộ URL (chuẩn SEO).
   /[^a-z0-9]+/g: loại bỏ ký tự đặc biệt, giữ lại chữ thường & số.
@@ -198,6 +201,7 @@ const verifyJWT = (req, res, next) => {
   nanoid() thêm phần ngẫu nhiên để tránh trùng slug 
 */
 const slugify = (title) => {
+
   // Sử dụng transliteration để chuyển đổi tiêu đề sang dạng không dấu
   const cleanTitle = translitSlugify(title);
 
@@ -399,8 +403,10 @@ server.get("/get-upload-url", async (req, res) => {
   -1	Giảm dần (descending)	từ lớn → nhỏ, từ mới → cũ, từ Z → A
 */
 
-server.get("/latest-blogs", async (req, res) => {
+server.post("/latest-blogs", async (req, res) => {
   try {
+    let { page } = req.body;
+
     const maxLimit = 5;
 
     const blogs = await Blog.find({ draft: false })
@@ -410,6 +416,7 @@ server.get("/latest-blogs", async (req, res) => {
       )
       .sort({ publishedAt: -1 })
       .select("blog_id title des banner activity tags publishedAt -_id")
+      .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
     return res.status(200).json({ blogs });
@@ -417,6 +424,18 @@ server.get("/latest-blogs", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+server.post("/all-latest-blogs-count", async (req, res) => {
+  try {
+    const count = await Blog.countDocuments({ draft: false });
+
+    return res.status(200).json({ totalDocs: count });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//======================================================================================
 
 server.get("/trending-blogs", async (req, res) => {
   try {
@@ -437,6 +456,46 @@ server.get("/trending-blogs", async (req, res) => {
 
     return res.status(200).json({ blogs });
   } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//======================================================================================
+
+server.post("/search-blogs", async (req, res) => {
+  try {
+    let { tag, page } = req.body;
+
+    let maxLimit = 2;
+    let findQuery = { tags: tag, draft: false };
+
+    const blogs = await Blog.find(findQuery)
+      .populate(
+        "author", // Đối số thứ nhất: tên field chứa ObjectId tham chiếu đến collection khác
+        "personal_info.profile_img personal_info.username personal_info.fullname -_id" // Đối số thứ hai: chỉ định các trường cần lấy từ document được populate
+      )
+      .sort({ publishedAt: -1 })
+      .select("blog_id title des banner activity tags publishedAt -_id")
+      .skip((page - 1) * maxLimit)
+      .limit(maxLimit);
+
+    return res.status(200).json({ blogs });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+server.post("/search-blogs-count", async (req, res) => {
+  try {
+    let { tag } = req.body;
+
+    let findQuery = { tags: tag, draft: false };
+
+    const count = await Blog.countDocuments(findQuery);
+
+    return res.status(200).json({ totalDocs: count });
+  } catch (error) {
+    console.log(error.message);
     return res.status(500).json({ error: error.message });
   }
 });
