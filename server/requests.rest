@@ -39,4 +39,12 @@
 # }
 
 # POST http://localhost:3000/all-latest-blogs-count
-POST http://localhost:3000/search-blogs-count
+# POST http://localhost:3000/search-blogs-count
+
+
+POST http://localhost:3000/search-users 
+Content-Type: application/json 
+
+{
+    "query": "trntruongthanh"
+}

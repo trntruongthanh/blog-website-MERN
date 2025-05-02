@@ -61,7 +61,7 @@ const Navbar = () => {
         {/*INPUT */}
         <div
           className={
-            (searchBoxVisibility ? "block" : "hidden") +
+            (searchBoxVisibility ? "block" : "hidden ") +
             "md:block absolute md:relative bg-white w-full md:w-auto left-0 top-full md:top-auto mt-0.5 md:mt-0 border-b border-grey py-4 px-[5vw] md:px-0"
           }
         >

@@ -201,7 +201,6 @@ const verifyJWT = (req, res, next) => {
   nanoid() thêm phần ngẫu nhiên để tránh trùng slug 
 */
 const slugify = (title) => {
-
   // Sử dụng transliteration để chuyển đổi tiêu đề sang dạng không dấu
   const cleanTitle = translitSlugify(title);
 
@@ -464,10 +463,16 @@ server.get("/trending-blogs", async (req, res) => {
 
 server.post("/search-blogs", async (req, res) => {
   try {
-    let { tag, page } = req.body;
+    let { tag, page, query } = req.body;
 
     let maxLimit = 2;
-    let findQuery = { tags: tag, draft: false };
+    let findQuery;
+
+    if (tag) {
+      findQuery = { tags: tag, draft: false };
+    } else if (query) {
+      findQuery = { draft: false, title: new RegExp(query, "i") };
+    }
 
     const blogs = await Blog.find(findQuery)
       .populate(
@@ -487,13 +492,42 @@ server.post("/search-blogs", async (req, res) => {
 
 server.post("/search-blogs-count", async (req, res) => {
   try {
-    let { tag } = req.body;
+    let { tag, query } = req.body;
 
-    let findQuery = { tags: tag, draft: false };
+    let findQuery;
+
+    if (tag) {
+      findQuery = { tags: tag, draft: false };
+    } else if (query) {
+      findQuery = { draft: false, title: new RegExp(query, "i") };
+    }
 
     const count = await Blog.countDocuments(findQuery);
 
     return res.status(200).json({ totalDocs: count });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//======================================================================================
+
+server.post("/search-users", async (req, res) => {
+  try {
+    let { query } = req.body;
+
+    let maxLimit = 50;
+
+    const users = await User.find({
+      "personal_info.username": new RegExp(query, "i"),
+    })
+      .limit(maxLimit)
+      .select(
+        "personal_info.fullname personal_info.username personal_info.profile_img -_id"
+      );
+
+    return res.status(200).json({ users });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ error: error.message });

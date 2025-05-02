@@ -7,6 +7,7 @@ import Navbar from "./components/navbar.component";
 import UserAuthForm from "./pages/userAuthForm.page";
 import Editor from "./pages/editor.pages";
 import HomePage from "./pages/home.page";
+import SearchPage from "./pages/search.page";
 
 /*
   Điểm cần lưu ý
@@ -44,6 +45,15 @@ const App = () => {
   /*
     index là cú pháp mới trong React Router v6 để khai báo route con mặc định của một layout cha.
     Bắt buộc phải có <Outlet /> trong Navbar để route con hiển thị đúng.
+
+    :query là một "route parameter", hay còn gọi là tham số động trên URL.
+    :query là phần biến động giay, laptop, sofa là giá trị cụ thể mà bạn có thể truy cập trong component thông qua hook useParams()
+  
+    :query = định nghĩa route động.
+    useNavigate() = dùng để đẩy giá trị vào :query.
+    useParams() = dùng để lấy giá trị từ :query.
+    Tóm lại: useNavigate đẩy vào, :query nhận vào, useParams đọc ra 🎯
+  
   */
 
   return (
@@ -55,6 +65,7 @@ const App = () => {
           <Route index element={<HomePage />} />
           <Route path="signin" element={<UserAuthForm type="sign-in" />} />
           <Route path="signup" element={<UserAuthForm type="sign-up" />} />
+          <Route path="search/:query" element={<SearchPage />} />
         </Route>
       </Routes>
     </UserContext.Provider>
