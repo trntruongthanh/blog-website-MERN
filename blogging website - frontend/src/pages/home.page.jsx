@@ -216,6 +216,7 @@ const HomePage = () => {
                 <NoDataMessage message="No trending blogs" />
               )}
             </>
+            
           </InPageNavigation>
         </div>
 

@@ -23,8 +23,7 @@ const days = [
   "Saturday",
 ];
 
-const formatTimeAgo = (dateString) => {
-
+export const formatTimeAgo = (dateString) => {
   // Lấy thời gian hiện tại
   const now = new Date();
 
@@ -34,7 +33,7 @@ const formatTimeAgo = (dateString) => {
   const diff = Math.floor((now - published) / 1000);
 
   if (diff < 60) return "just done";
-  
+
   // Nếu dưới 1 giờ → trả về số phút trước
   if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
 
@@ -51,10 +50,26 @@ const formatTimeAgo = (dateString) => {
   const year = published.getFullYear();
 
   const hour = published.getHours().toString().padStart(2, "0");
-  
+
   const minute = published.getMinutes().toString().padStart(2, "0");
 
   return `${dayOfWeek}, ${day} ${monthName} ${year} - ${hour}:${minute}`;
 };
 
-export default formatTimeAgo;
+export const formatJoined = (dateString) => {
+  const now = new Date();
+  const published = new Date(dateString);
+  const diff = Math.floor((now - published) / 1000);
+
+  if (diff < 60) return "just done";
+  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+
+  const dayOfWeek = days[published.getDay()];
+  const day = published.getDate().toString().padStart(2, "0");
+  const monthName = month[published.getMonth()];
+  const year = published.getFullYear();
+
+  // Bỏ phần giờ và phút
+  return `${dayOfWeek}, ${day} ${monthName} ${year}`;
+};

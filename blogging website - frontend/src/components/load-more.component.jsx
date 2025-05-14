@@ -1,5 +1,10 @@
 import Button from "./Button";
 
+/**
+  state != null: Đảm bảo đã có dữ liệu blog hiện tại.
+  state.totalDocs > state.results.length: Chỉ hiển thị nút nếu chưa hiển thị hết toàn bộ blog.
+ */
+
 const LoadMoreDataBtn = ({ state, fetchDataFunc }) => {
   
   if (state != null && state.totalDocs > state.results.length) {

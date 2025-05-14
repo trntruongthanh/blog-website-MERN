@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import formatTimeAgo from "../common/date";
+import { formatTimeAgo } from "../common/date";
 
 const MinimalBlogPost = ({ data, index }) => {
   const {

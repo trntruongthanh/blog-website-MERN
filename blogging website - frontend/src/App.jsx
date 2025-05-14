@@ -9,6 +9,7 @@ import Editor from "./pages/editor.pages";
 import HomePage from "./pages/home.page";
 import SearchPage from "./pages/search.page";
 import PageNotFound from "./pages/404.page";
+import ProfilePage from "./pages/profile.page";
 
 /*
   Điểm cần lưu ý
@@ -25,6 +26,8 @@ export const UserContext = createContext({});
 const App = () => {
   /*
   lookInSession("user") kiểm tra xem có dữ liệu người dùng trong session storage không.
+  JSON.parse() nhận vào một chuỗi JSON và chuyển đổi (transform) nó thành một đối tượng JavaScript
+  JSON.stringify() làm điều ngược lại - lấy một đối tượng JavaScript và chuyển đổi nó thành một chuỗi JSON.
   */
   const [userAuth, setUserAuth] = useState({});
 
@@ -54,7 +57,8 @@ const App = () => {
     useNavigate() = dùng để đẩy giá trị vào :query.
     useParams() = dùng để lấy giá trị từ :query.
     Tóm lại: useNavigate đẩy vào, :query nhận vào, useParams đọc ra 🎯
-  
+
+    path="*" – Catch-all Route (Bắt mọi route không khớp)
   */
 
   return (
@@ -67,6 +71,7 @@ const App = () => {
           <Route path="signin" element={<UserAuthForm type="sign-in" />} />
           <Route path="signup" element={<UserAuthForm type="sign-up" />} />
           <Route path="search/:query" element={<SearchPage />} />
+          <Route path="user/:id" element={<ProfilePage />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>

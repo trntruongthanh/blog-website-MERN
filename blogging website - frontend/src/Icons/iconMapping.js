@@ -9,6 +9,10 @@ import {
   CrossMallIcon,
   LikeIcon,
   ArrowUpIcon,
+  YoutubeIcon,
+  InstagramIcon,
+  GithubIcon,
+  WebsiteIcon,
 } from "./icon";
 
 export const ICONS = {
@@ -22,4 +26,11 @@ export const ICONS = {
   crossMallIcon: CrossMallIcon,
   likeIcon: LikeIcon,
   arrowUpIcon: ArrowUpIcon,
+};
+
+export const SOCIAL_ICONS = {
+  youtube: YoutubeIcon,
+  instagram: InstagramIcon,
+  github: GithubIcon,
+  website: WebsiteIcon,
 };

@@ -41,10 +41,10 @@ const Editor = () => {
   const value = {
     editorState,
     setEditorState,
-    blog,
-    setBlog,
     textEditor,
     setTextEditor,
+    blog,
+    setBlog,
   };
 
   return (
