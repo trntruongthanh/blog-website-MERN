@@ -49,9 +49,16 @@
 #     "query": "trntruongthanh"
 # }
 
-POST http://localhost:3000/get-profile
+# POST http://localhost:3000/get-profile
+# Content-Type: application/json 
+
+# {
+#     "username": "trntruongthanh"
+# }
+
+POST http://localhost:3000/get-blog
 Content-Type: application/json 
 
 {
-    "username": "trntruongthanh"
+    "blog_id": "bien-A9jl5"
 }

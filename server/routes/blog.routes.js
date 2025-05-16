@@ -6,6 +6,7 @@ import {
   getTrendingBlogs,
   searchBlogs,
   searchBlogsCount,
+  getBlog,
 } from "../controllers/blog.controller.js";
 
 import verifyJWT from "../middlewares/verifyJWT.js";
@@ -18,5 +19,6 @@ router.post("/all-latest-blogs-count", getAllLatestBlogsCount);
 router.get("/trending-blogs", getTrendingBlogs);
 router.post("/search-blogs", searchBlogs);
 router.post("/search-blogs-count", searchBlogsCount);
+router.post("/get-blog", getBlog);
 
 export default router;

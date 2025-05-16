@@ -4,6 +4,7 @@ let emailRegex = /^\w+([\.-]?\w+)_@\w+([\.-]?\w+)_(\.\w{2,3})+$/; // regex for e
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
 # Đây trong file server kiểm tra đã kết nối DB
+
 Dễ dàng bắt lỗi kết nối (error).
 Biết khi MongoDB bị mất kết nối (disconnected).
 Log rõ ràng khi kết nối thành công (connected).
@@ -58,11 +59,10 @@ Mã lỗi MongoDB (Mongoose Errors)
 
 ============================================================================================
 FILE request.rest
-Content-Type	                            Cách gửi dữ liệu	        Middleware cần thiết
-application/json	                        { "name": "A" }	            express.json()
-application/x-www-form-urlencoded	        name=A&age=20	            express.urlencoded({ extended: true })
-multipart/form-data	Upload file	multer
-
+Content-Type Cách gửi dữ liệu Middleware cần thiết
+application/json { "name": "A" } express.json()
+application/x-www-form-urlencoded name=A&age=20 express.urlencoded({ extended: true })
+multipart/form-data Upload file multer
 
 📌 Ví dụ dùng express.urlencoded() để nhận dữ liệu từ form HTML
 server.use(express.urlencoded({ extended: true }));
