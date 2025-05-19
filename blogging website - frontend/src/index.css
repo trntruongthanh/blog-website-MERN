@@ -139,6 +139,46 @@
     }
 }
 
+/* Thêm vào CSS toàn cục (hoặc import vào component nếu dùng module) 
+
+    .tippy-box: lớp ngoài cùng của tooltip do Tippy tạo ra.
+    [data-theme~='custom']: chỉ áp dụng với tooltip nào đang dùng theme="custom".
+    [data-placement^='top']: tooltip nằm ở phía trên phần tử → mũi tên chỉ xuống. Tương tự:
+    bottom → mũi tên chỉ lên
+    left → mũi tên chỉ phải
+    right → mũi tên chỉ trái
+    .tippy-arrow: phần tử mũi tên (arrow) của tooltip.
+    border-*-color: mỗi mũi tên thực chất là một border được hiển thị theo hướng → bạn đổi màu viền để tạo màu cho mũi tên theo hướng tương ứng.
+*/
+.tippy-box[data-theme~='custom'] {
+
+    background-color: #1f2937;
+    /* dark gray (Tailwind gray-800) */
+    color: #fff;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    line-height: 1.5;
+}
+
+.tippy-box[data-theme~='custom'][data-placement^='top']>.tippy-arrow {
+    border-top-color: #1f2937;
+}
+
+.tippy-box[data-theme~='custom'][data-placement^='bottom']>.tippy-arrow {
+    border-bottom-color: #1f2937;
+}
+
+.tippy-box[data-theme~='custom'][data-placement^='left']>.tippy-arrow {
+    border-left-color: #1f2937;
+}
+
+.tippy-box[data-theme~='custom'][data-placement^='right']>.tippy-arrow {
+    border-right-color: #1f2937;
+}
+
+
 /*===========================Tùy chỉnh Editor.js===========================*/
 .ce-block__content,
 .ce-toolbar__content {

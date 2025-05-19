@@ -23,6 +23,7 @@ const days = [
   "Saturday",
 ];
 
+// format đầy đủ thứ trong tuần, ngày, tháng, năm, giờ và phút
 export const formatTimeAgo = (dateString) => {
   // Lấy thời gian hiện tại
   const now = new Date();
@@ -56,20 +57,44 @@ export const formatTimeAgo = (dateString) => {
   return `${dayOfWeek}, ${day} ${monthName} ${year} - ${hour}:${minute}`;
 };
 
+
+// format thứ trong tuần, ngày, tháng, năm
 export const formatJoined = (dateString) => {
   const now = new Date();
+
   const published = new Date(dateString);
+
   const diff = Math.floor((now - published) / 1000);
 
   if (diff < 60) return "just done";
+
   if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+
   if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
 
   const dayOfWeek = days[published.getDay()];
+
   const day = published.getDate().toString().padStart(2, "0");
+
   const monthName = month[published.getMonth()];
+
   const year = published.getFullYear();
 
   // Bỏ phần giờ và phút
   return `${dayOfWeek}, ${day} ${monthName} ${year}`;
+};
+
+
+// Format chỉ ngày tháng năm
+export const formatDateOnly = (dateString) => {
+
+  const published = new Date(dateString);
+
+  const day = published.getDate().toString().padStart(2, "0");
+
+  const monthName = month[published.getMonth()];
+
+  const year = published.getFullYear();
+
+  return `${day} ${monthName} ${year}`;
 };

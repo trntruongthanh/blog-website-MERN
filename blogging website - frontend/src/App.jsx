@@ -26,9 +26,12 @@ export const UserContext = createContext({});
 
 const App = () => {
   /*
-  lookInSession("user") kiểm tra xem có dữ liệu người dùng trong session storage không.
-  JSON.parse() nhận vào một chuỗi JSON và chuyển đổi (transform) nó thành một đối tượng JavaScript
-  JSON.stringify() làm điều ngược lại - lấy một đối tượng JavaScript và chuyển đổi nó thành một chuỗi JSON.
+    lookInSession("user") kiểm tra xem có dữ liệu người dùng trong session storage không.
+    JSON.parse() nhận vào một chuỗi JSON và chuyển đổi (transform) nó thành một đối tượng JavaScript
+    JSON.stringify() làm điều ngược lại - lấy một đối tượng JavaScript và chuyển đổi nó thành một chuỗi JSON.
+  
+    Mục đích của đoạn code này là:
+    Giữ trạng thái đăng nhập của người dùng sau khi reload trang.
   */
   const [userAuth, setUserAuth] = useState({});
 
@@ -69,12 +72,16 @@ const App = () => {
 
         <Route path="/" element={<Navbar />}>
           <Route index element={<HomePage />} />
+
           <Route path="signin" element={<UserAuthForm type="sign-in" />} />
           <Route path="signup" element={<UserAuthForm type="sign-up" />} />
+
           <Route path="search/:query" element={<SearchPage />} />
-          <Route path="user/:id" element={<ProfilePage />} />
           <Route path="blog/:blog_id" element={<BlogPage />} />
           <Route path="trending-blog/:blog_id" element={<BlogPage />} />
+
+          <Route path="user/:id" element={<ProfilePage />} />
+          
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>
