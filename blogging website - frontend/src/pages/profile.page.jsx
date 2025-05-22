@@ -105,6 +105,17 @@ const ProfilePage = () => {
         create_new_arr,
       });
 
+
+      /*
+        Ghi lại user_id vào trong object formatedData để có thể dùng lại ở lần gọi sau
+        (giống như "ghi nhớ" user đó là ai).
+
+        Vì đoạn đầu của hàm getBlogs có logic sau: user_id = user_id === undefined ? blogs.user_id : user_id;
+        Nếu bạn không truyền user_id vào hàm getBlogs (ví dụ khi load thêm trang mới trong pagination),
+        Thì nó sẽ lấy user_id từ blogs.user_id (được lưu từ lần gọi trước đó).
+        
+        ➡️ Để blogs.user_id tồn tại thì bạn phải gán user_id vào formatedData trước khi setBlogs(formatedData).
+      */
       formatedData.user_id = user_id;
 
       setBlogs(formatedData);

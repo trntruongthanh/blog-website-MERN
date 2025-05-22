@@ -8,6 +8,8 @@ export default {
       grey: "#F3F3F3",
       "dark-grey": "#6B6B6B",
       "lavender": "#e6e6fa",
+      "pink-pastel": "#FFDCE3",
+      "facebook": "#1877F2",
       red: "#FF4E4E",
       transparent: "transparent",
       twitter: "#1DA1F2",

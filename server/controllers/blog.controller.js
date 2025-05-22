@@ -101,13 +101,13 @@ export const getTrendingBlogs = async (req, res) => {
 */
 export const searchBlogs = async (req, res) => {
   try {
-    const { tag, page, query, author } = req.body;
+    const { tag, page, query, author, limit, eliminate_blog } = req.body;
 
-    const maxLimit = 2;
+    const maxLimit = limit ? limit : 2;
     let findQuery;
 
     if (tag) {
-      findQuery = { tags: tag, draft: false };
+      findQuery = { tags: tag, draft: false, blog_id: { $ne: eliminate_blog } };
     } else if (query) {
       findQuery = { draft: false, title: new RegExp(query, "i") };
     } else if (author) {
@@ -317,13 +317,11 @@ export const getBlog = async (req, res) => {
           $inc: { "account_info.total_reads": incrementValue },
         }
       );
-
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
 
     return res.status(200).json({ blog });
-    
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

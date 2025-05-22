@@ -12,10 +12,10 @@ const Button = forwardRef(function Button(
       onClick={onClick}
       disabled={disabled}
       className={clsx(
-        className,
         "font-medium transition duration-200 ease-in-out",
         { "hover:bg-lavender active:bg-lavender": !disabled },
-        { "disabled:bg-gray-300 disabled:cursor-not-allowed": disabled }
+        { "disabled:bg-gray-300 disabled:cursor-not-allowed": disabled },
+        className,
       )}
     >
       {children}

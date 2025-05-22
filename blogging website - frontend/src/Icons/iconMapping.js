@@ -8,11 +8,13 @@ import {
   BellIcon,
   CrossMallIcon,
   LikeIcon,
+  CommentIcon,
   ArrowUpIcon,
   YoutubeIcon,
   InstagramIcon,
   GithubIcon,
   WebsiteIcon,
+  FacebookIcon,
 } from "./icon";
 
 export const ICONS = {
@@ -25,6 +27,7 @@ export const ICONS = {
   bellIcon: BellIcon,
   crossMallIcon: CrossMallIcon,
   likeIcon: LikeIcon,
+  commentIcon: CommentIcon,
   arrowUpIcon: ArrowUpIcon,
 };
 
@@ -33,4 +36,5 @@ export const SOCIAL_ICONS = {
   instagram: InstagramIcon,
   github: GithubIcon,
   website: WebsiteIcon,
+  facebook: FacebookIcon,
 };
