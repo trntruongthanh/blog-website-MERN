@@ -1,7 +1,7 @@
 import Embed from "@editorjs/embed";
 import List from "@editorjs/list";
-import Image from "@editorjs/image";
 import Header from "@editorjs/header";
+import ImageTool from "@editorjs/image";
 import Quote from "@editorjs/quote";
 import Marker from "@editorjs/marker";
 import InlineCode from "@editorjs/inline-code";
@@ -78,12 +78,13 @@ export const tools = {
     inlineToolbar: true,  // Allow formatting text within list items
   },
   image: {
-    class: Image,
+    class: ImageTool,
     config: {
       uploader: {
         uploadByUrl: uploadImageByURL,    // Function to handle URL-based image uploads
         uploadByFile: uploadImageByFile,  // Function to handle file-based image uploads
       },
+      captionPlaceholder: "Type caption here...",
     },
   },
   header: {

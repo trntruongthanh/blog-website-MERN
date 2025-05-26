@@ -10,6 +10,7 @@ import Loader from "../components/loader.component";
 
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogPostCard from "../components/blog-post.component";
+import BlogContent from "../components/blog-content.component";
 
 export const blogStructure = {
   title: "",
@@ -23,11 +24,11 @@ export const blogStructure = {
 export const BlogContext = createContext({});
 
 const BlogPage = () => {
-  const { blog_id } = useParams();
+  const { blog_id } = useParams();  // Lấy blog_id từ URL
 
-  const [blog, setBlog] = useState(blogStructure);
+  const [blog, setBlog] = useState(blogStructure);   // State lưu blog hiện tại
 
-  const [similarBlogs, setSimilarBlogs] = useState(null);
+  const [similarBlogs, setSimilarBlogs] = useState(null);  // Blog tương tự
 
   const [loading, setLoading] = useState(true);
 
@@ -56,23 +57,30 @@ const BlogPage = () => {
         return;
       }
 
+      console.log(blog.content);
       setBlog(blog); // Cập nhật ngay khi fetch được blog
 
-      // Sau đó mới gọi API phụ
+      /*
+        💡 Mục đích
+        Tìm những bài blog có cùng tag với blog đang xem (blog hiện tại) và không bao gồm chính blog đó (loại trừ blog hiện tại).
+
+        tag: chỉ định tag cần tìm blog tương tự.
+        limit: giới hạn số lượng blog trả về (ở đây là 6).
+        eliminate_blog: truyền blog_id hiện tại để loại bỏ nó khỏi danh sách blog tương tự (nếu không làm điều này thì nó có thể tự hiện lại trong danh sách).
+      */
       try {
         const {
           data: { blogs },
         } = await axios.post(
           import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs",
           {
-            tag: blog.tags[0],
-            limit: 6,
-            eliminate_blog: blog_id,
+            tag: blog.tags[0],          // Lọc theo tag đầu tiên của blog hiện tại
+            limit: 6,                   // Giới hạn kết quả tối đa là 6 blog
+            eliminate_blog: blog_id,    // Không lấy chính blog hiện tại
           }
         );
 
         setSimilarBlogs(blogs);
-        
       } catch (error) {
         console.log(error);
       }
@@ -145,6 +153,15 @@ const BlogPage = () => {
             <BlogInteraction />
 
             {/* Blog Content will go over here */}
+            <div className="my-12 font-gelasio blog-page-content">
+              {content[0].blocks.map((block, index) => {
+                return (
+                  <div key={index} className="my-4 md:my-8">
+                    <BlogContent block={block} />
+                  </div>
+                );
+              })}
+            </div>
 
             <BlogInteraction />
 

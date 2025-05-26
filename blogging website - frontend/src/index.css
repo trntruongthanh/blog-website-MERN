@@ -137,7 +137,21 @@
     .blog-index {
         @apply text-4xl sm:text-3xl lg:text-5xl font-bold text-grey leading-none;
     }
+
 }
+
+.image-tool__caption {
+    visibility: visible !important;
+    position: static !important;
+    bottom: 0;
+    left: 0;
+    margin-bottom: 10px;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: #6b7280;  /*gray-500*/
+}
+
+
 
 /* Thêm vào CSS toàn cục (hoặc import vào component nếu dùng module) 
 
