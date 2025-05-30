@@ -63,12 +63,28 @@ const App = () => {
     Tóm lại: useNavigate đẩy vào, :query nhận vào, useParams đọc ra 🎯
 
     path="*" – Catch-all Route (Bắt mọi route không khớp)
+
+  ===========================================================================================
+
+    App
+    └── <Editor /> mount
+        ├── Khởi tạo state: loading = true
+        ├── Gọi useEffect: fetch blog từ server
+        ├── Khi xong: setBlog + setLoading(false)
+        └── Render <BlogEditor />
+
+            <BlogEditor /> mount
+            ├── useContext lấy blog + textEditor từ EditorContext
+            ├── useEffect kiểm tra !textEditor.isReady
+            ├── Gọi new EditorJS(...)
+            └── Gán instance vào context
   */
 
   return (
     <UserContext.Provider value={value}>
       <Routes>
         <Route path="/editor" element={<Editor />} />
+        <Route path="/editor/:blog_id" element={<Editor />} />
 
         <Route path="/" element={<Navbar />}>
           <Route index element={<HomePage />} />
@@ -81,7 +97,7 @@ const App = () => {
           <Route path="trending-blog/:blog_id" element={<BlogPage />} />
 
           <Route path="user/:id" element={<ProfilePage />} />
-          
+
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>

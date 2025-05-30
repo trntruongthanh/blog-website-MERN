@@ -38,6 +38,8 @@ import slugify from "../utils/slugify.js"; // Sử dụng slugify để tạo bl
 
 */
 
+//============================================================================================
+
 // Lấy blog mới nhất
 export const getLatestBlogs = async (req, res) => {
   try {
@@ -59,6 +61,8 @@ export const getLatestBlogs = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+//============================================================================================
 
 // Đếm tổng số blog (latest)
 export const getAllLatestBlogsCount = async (req, res) => {
@@ -93,6 +97,8 @@ export const getTrendingBlogs = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+//===========================================================================================
 
 /*
   Tìm kiếm blog
@@ -130,6 +136,8 @@ export const searchBlogs = async (req, res) => {
   }
 };
 
+//===========================================================================================
+
 // Đếm số kết quả tìm kiếm  2. /search-blogs-count – Đếm tổng số blog phù hợp
 // Mục đích: Trả về số lượng tổng cộng các blog phù hợp với điều kiện lọc.
 export const searchBlogsCount = async (req, res) => {
@@ -157,13 +165,13 @@ export const searchBlogsCount = async (req, res) => {
   }
 };
 
+//========================================================================================
+
 // Tạo blog mới
 export const createBlog = async (req, res) => {
   let authorId = req.user; // ID của tác giả từ middleware verifyJWT
 
-  let { title, des, banner, tags, content, draft } = req.body;
-
-  // ================= Validation ===================
+  let { title, des, banner, tags, content, draft, id } = req.body;
 
   // Kiểm tra tiêu đề có tồn tại không
   if (!title.length) {
@@ -201,33 +209,47 @@ export const createBlog = async (req, res) => {
     }
   }
 
-  // ================== Xử lý ===================
-
   // Chuyển tất cả tag thành chữ thường để đồng nhất.
   tags = tags.map((tag) => tag.toLowerCase());
 
   // Tạo blog_id từ title
-  let blog_id = slugify(title);
+  let blog_id = id || slugify(title);
 
-  let blog = new Blog({
-    title,
-    banner,
-    des,
-    tags,
-    content,
-    blog_id,
-    author: authorId,
-    draft: Boolean(draft), // true nếu là bản nháp, false nếu là bài thật
-  });
-
-  try {
-    // Lưu blog vào database
-    const savedBlog = await blog.save();
-
-    // Nếu là bản nháp (draft), không tăng số lượng bài viết. Nếu là bài thật, tăng 1 vào account_info.total_posts.
-    const incrementValue = draft ? 0 : 1;
+  if (id) {
 
     try {
+      await Blog.findOneAndUpdate(
+        { blog_id },
+        { title, des, banner, content, draft: draft ? draft : false }
+      );
+
+      return res.status(200).json({ id: blog_id })
+
+    } catch (error) {
+      return res.status(500).json({ error: "Fail to update total posts number" });
+    }
+
+  } else {
+
+    let blog = new Blog({
+      title,
+      banner,
+      des,
+      tags,
+      content,
+      blog_id,
+      author: authorId,
+      draft: Boolean(draft), // true nếu là bản nháp, false nếu là bài thật
+    });
+
+    try {
+      // Lưu blog vào database
+      const savedBlog = await blog.save();
+
+      // Nếu là bản nháp (draft), không tăng số lượng bài viết. Nếu là bài thật, tăng 1 vào account_info.total_posts.
+      const incrementValue = draft ? 0 : 1;
+
+      try {
       /*
         { _id: authorId }
         Đây là điều kiện truy vấn (filter) – MongoDB sẽ tìm một document trong collection User có _id bằng authorId.
@@ -247,33 +269,37 @@ export const createBlog = async (req, res) => {
         | `savedBlog.blog_id` | Slug từ tiêu đề, do bạn tự tạo | Dùng trong URL hoặc hiển thị ra bên ngoài |
 
       */
-      await User.findOneAndUpdate(
-        { _id: authorId },
-        {
-          $inc: { "account_info.total_posts": incrementValue },
-          $push: { blogs: savedBlog._id },
-        }
-      );
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ error: "Failed to update total posts number" });
-    }
+        await User.findOneAndUpdate(
+          { _id: authorId },
+          {
+            $inc: { "account_info.total_posts": incrementValue },
+            $push: { blogs: savedBlog._id },
+          }
+        );
+      } catch (err) {
+        return res
+          .status(500)
+          .json({ error: "Failed to update total posts number" });
+      }
 
-    return res.status(200).json({ id: savedBlog.blog_id });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to create blog" });
+      return res.status(200).json({ id: savedBlog.blog_id });
+
+    } catch (err) {
+      return res.status(500).json({ error: "Failed to create blog" });
+    }
   }
 };
+
+//===========================================================================================
 
 // Controller để lấy thông tin chi tiết 1 blog (và tăng số lượt đọc)
 export const getBlog = async (req, res) => {
   try {
     // Lấy blog_id từ body của request gửi lên (thường là từ client)
-    let { blog_id } = req.body;
+    let { blog_id, draft, mode } = req.body;
 
     // Số lượt đọc sẽ tăng thêm 1 mỗi lần blog được đọc
-    let incrementValue = 1;
+    let incrementValue = mode !== "edit" ? 1 : 0;
 
     /*
       Tìm blog theo blog_id, đồng thời:
@@ -308,7 +334,7 @@ export const getBlog = async (req, res) => {
         "author",
         "personal_info.fullname personal_info.username personal_info.profile_img"
       )
-      .select("title des content banner activity publishedAt blog_id tags");
+      .select("title des content banner activity publishedAt blog_id tags draft");
 
     try {
       await User.findOneAndUpdate(
@@ -319,6 +345,18 @@ export const getBlog = async (req, res) => {
       );
     } catch (error) {
       return res.status(500).json({ error: error.message });
+    }
+
+    /*
+        Giải thích chi tiết
+      blog.draft: là trạng thái của bài viết, true nghĩa là bài viết là bản nháp, chưa được xuất bản.
+      draft: là giá trị client gửi lên, thường là true hoặc false, báo với server rằng client có quyền xem bản nháp hay không.
+
+      Gọi API không gửi draft = chỉ xem được blog đã xuất bản (không phải bản nháp).
+      Muốn xem blog draft phải gọi API và gửi { blog_id, draft: true }.
+    */
+    if (blog.draft && !draft) {
+      return res.status(500).json({ error: "you can not access draft blogs" });
     }
 
     return res.status(200).json({ blog });

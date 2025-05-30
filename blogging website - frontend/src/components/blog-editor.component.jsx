@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useContext, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import EditorJS from "@editorjs/editorjs";
@@ -14,7 +14,8 @@ import { UserContext } from "../App";
 import { tools } from "./tools.component";
 
 const BlogEditor = () => {
-  const { setEditorState, blog, setBlog, textEditor, setTextEditor } = useContext(EditorContext);
+  const { setEditorState, blog, setBlog, textEditor, setTextEditor } =
+    useContext(EditorContext);
 
   const { title, banner, content, tags, des } = blog;
 
@@ -22,28 +23,64 @@ const BlogEditor = () => {
     userAuth: { access_token },
   } = useContext(UserContext);
 
+  const { blog_id } = useParams();
+
   const navigate = useNavigate();
+
+  //=========================================================================================
 
   /*
     isReady là một Promise được EditorJS cung cấp để thông báo khi trình soạn thảo đã khởi tạo xong:
     Khi EditorJS hoàn tất việc khởi tạo, Promise này sẽ resolve (hoàn thành). Nếu có lỗi trong quá trình khởi tạo, nó sẽ reject (thất bại).
   */
   useEffect(() => {
+    let editorInstance; // Khai báo biến cục bộ để lưu instance của EditorJS
 
+    // Nếu editor chưa tồn tại hoặc chưa sẵn sàng => khởi tạo mới
     if (!textEditor || !textEditor.isReady) {
-      
-      const editorInstance = new EditorJS({
-        holder: "textEditor",
-        data: content,
-        tools: tools,
+      editorInstance = new EditorJS({
+        holder: "textEditor",                                   // ID của phần tử HTML sẽ chứa editor
+        data: Array.isArray(content) ? content[0] : content,    // Dữ liệu hiện tại của blog (dùng cho khi edit lại)
+        tools: tools,                                           // Bộ công cụ được cấu hình (Header, List, Quote, v.v...)   
         placeholder: "Let's write an awesome story",
       });
 
+      // Lưu instance mới vào context để dùng sau này
       setTextEditor(editorInstance);
     }
 
+    return () => {
+
+      // Nếu editorInstance tồn tại và có hàm destroy
+      if (editorInstance && editorInstance.destroy) {
+
+        // Đợi editor sẵn sàng rồi mới destroy (tránh lỗi)
+        editorInstance.isReady
+          .then(() => {
+            editorInstance.destroy();
+          })
+          .catch((err) => {
+            console.error("Failed to destroy editor:", err);
+          });
+      }
+    };
+
     // console.log(textEditor)
   }, []);
+
+  // useEffect(() => {
+  //   console.log("textEditor trong useEffect:", textEditor);
+
+  //   if (textEditor && textEditor.isReady) {
+  //     textEditor.isReady
+  //       .then(() => {
+  //         console.log("✅ Editor đã sẵn sàng");
+  //       })
+  //       .catch(() => {
+  //         console.log("❌ Editor chưa sẵn sàng");
+  //       });
+  //   }
+  // }, [textEditor]);
 
   // ========================================================================================
 
@@ -155,7 +192,7 @@ const BlogEditor = () => {
 
       await axios.post(
         import.meta.env.VITE_SERVER_DOMAIN + "/create-blog",
-        blogObj,
+        { ...blogObj, id: blog_id },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
