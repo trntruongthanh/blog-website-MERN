@@ -61,7 +61,6 @@ Dùng find() khi bạn cần nhiều document (danh sách, bảng, lọc, phân 
   Lưu ý: Mỗi lần hash, kết quả sẽ khác nhau do bcrypt sử dụng salt để ngăn chặn tấn công từ điển.
 
 
-
   Dòng này khởi tạo một ứng dụng Express mới và gán nó vào biến server.
 📦 Cụ thể:
   express() là hàm khởi tạo của thư viện Express.js, giúp bạn tạo một ứng dụng web/server HTTP.
@@ -76,6 +75,20 @@ Dùng find() khi bạn cần nhiều document (danh sách, bảng, lọc, phân 
 
   server.use(cors()): 
     Kích hoạt CORS middleware để cho phép truy cập từ các domain khác nhau.
+
+
+| Thuộc tính          | `_id`                                           | `blog_id`                                               |
+| ------------------  | ----------------------------------------------- | ------------------------------------------------------- |
+| ✅ **Nguồn gốc**    | Tự động do **MongoDB** tạo khi insert tài liệu. | Do bạn tự tạo (thường dùng `slugify(title)` hoặc UUID). |
+| ✅ **Kiểu dữ liệu** | `ObjectId` (kiểu riêng của MongoDB).            | `String`.                                               |
+| ✅ **Mục đích**     | Dùng để định danh tài liệu trong database.      | Dùng cho URL thân thiện, frontend route, hoặc SEO.      |
+| ✅ **Ví dụ**        | `665f05cbf01fd3d3adf63a93`                      | `how-to-code-react-hooks`                               |
+
+| Nếu bạn cần...                              | Nên dùng... |
+| ------------------------------------------- | ----------- |
+| Truy vấn chính xác document trong MongoDB   | `_id`       |
+| Hiển thị trên URL, SEO, người dùng đọc được | `blog_id`   |
+
 */
 
 import "dotenv/config";
@@ -88,6 +101,7 @@ import connectToMongoDB from "./config/mongoose.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import blogRoutes from "./routes/blog.routes.js";
+import interactionRoute from "./routes/interaction.route.js"
 import uploadRoutes from "./routes/upload.routes.js";
 import userRoutes from "./routes/user.routes.js";
 
@@ -107,6 +121,7 @@ connectToMongoDB(process.env.MONGO_BLOG_URL, !isProduction);
 // Routes
 server.use(authRoutes);
 server.use(blogRoutes);
+server.use(interactionRoute)
 server.use(uploadRoutes);
 server.use(userRoutes);
 

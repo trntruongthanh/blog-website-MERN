@@ -32,6 +32,8 @@ const BlogPage = () => {
 
   const [loading, setLoading] = useState(true);
 
+  const [isLikedByUser, setIsLikedByUser] = useState(false);
+
   const {
     title,
     content,
@@ -109,6 +111,8 @@ const BlogPage = () => {
   const value = {
     blog,
     setBlog,
+    isLikedByUser,
+    setIsLikedByUser
   };
 
   return (

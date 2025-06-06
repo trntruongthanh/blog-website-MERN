@@ -15,6 +15,7 @@ import {
   GithubIcon,
   WebsiteIcon,
   FacebookIcon,
+  LikedIcon,
 } from "./icon";
 
 export const ICONS = {
@@ -27,6 +28,7 @@ export const ICONS = {
   bellIcon: BellIcon,
   crossMallIcon: CrossMallIcon,
   likeIcon: LikeIcon,
+  likedIcon: LikedIcon,
   commentIcon: CommentIcon,
   arrowUpIcon: ArrowUpIcon,
 };
