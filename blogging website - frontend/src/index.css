@@ -11,6 +11,14 @@
     lg	≥ 1024px	laptop lớn
     xl	≥ 1280px	desktop
     2xl	≥ 1536px	màn cực lớn
+
+| Trường hợp                           | Nên viết trong `@layer components`?  | Ghi chú                                         |
+| ------------------------------------ | -----------------------------------  | ----------------------------------------------- |
+| Class tùy chỉnh, đơn giản (`.btn-*`) | ✅ Có                                | Tailwind sẽ giữ lại và tối ưu                   |
+| Class đến từ thư viện ngoài          | ❌ Không                             | Có nguy cơ bị purge nếu không có trong template |
+| Class có selector phức tạp (`.a .b`) | ❌ Không                             | Tailwind không xử lý tốt                        |
+| Dùng `@apply` với utility Tailwind   | ✅ Có                                | Miễn là chỉ dùng class hợp lệ                   |
+
 */
 
 
@@ -69,6 +77,11 @@
         @apply btn-dark bg-grey text-black;
     }
 
+    .btn-shadow {
+        box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+
     /*===========================Input Field===========================*/
     .input-box {
         @apply w-[100%] rounded-md p-4 bg-grey pl-12 border border-grey focus:bg-transparent placeholder:text-black;
@@ -77,6 +90,10 @@
     input:disabled,
     input:disabled~.input-icon {
         @apply opacity-50;
+    }
+
+    .box-shadow-left {
+        box-shadow:-4px 0 6px rgba(0, 0, 0, 0.1);
     }
 
     .input-icon {
@@ -148,7 +165,8 @@
     margin-bottom: 10px;
     font-style: italic;
     font-size: 1.4rem;
-    color: #6b7280;  /*gray-500*/
+    color: #6b7280;
+    /*gray-500*/
 }
 
 

@@ -11,6 +11,7 @@ import Loader from "../components/loader.component";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogPostCard from "../components/blog-post.component";
 import BlogContent from "../components/blog-content.component";
+import CommentContainer from "../components/comments.component";
 
 export const blogStructure = {
   title: "",
@@ -28,12 +29,16 @@ const BlogPage = () => {
 
   const [blog, setBlog] = useState(blogStructure);   // State lưu blog hiện tại
 
-  const [similarBlogs, setSimilarBlogs] = useState(null);  // Blog tương tự
+  const [similarBlogs, setSimilarBlogs] = useState(null);
 
   const [loading, setLoading] = useState(true);
 
   const [isLikedByUser, setIsLikedByUser] = useState(false);
 
+  const [commentsWrapper, setCommentsWrapper] = useState(true);
+
+  const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0);
+ 
   const {
     title,
     content,
@@ -98,6 +103,9 @@ const BlogPage = () => {
     setBlog(blogStructure);
     setSimilarBlogs(null);
     setLoading(true);
+    setIsLikedByUser(false);
+    // setCommentsWrapper(false);
+    setTotalParentCommentsLoaded(0);
   };
 
   useEffect(() => {
@@ -112,7 +120,11 @@ const BlogPage = () => {
     blog,
     setBlog,
     isLikedByUser,
-    setIsLikedByUser
+    setIsLikedByUser,
+    commentsWrapper,
+    setCommentsWrapper,
+    totalParentCommentsLoaded,
+    setTotalParentCommentsLoaded,
   };
 
   return (
@@ -121,6 +133,9 @@ const BlogPage = () => {
         <Loader />
       ) : (
         <BlogContext.Provider value={value}>
+          
+          <CommentContainer />
+
           <div className="max-w-[900px] center py-10 max-lg:px-[-5vw]">
             <img src={banner} className="aspect-video" />
 
@@ -193,6 +208,7 @@ const BlogPage = () => {
               ""
             )}
           </div>
+
         </BlogContext.Provider>
       )}
     </AnimationWrapper>

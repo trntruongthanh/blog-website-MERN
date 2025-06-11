@@ -1,14 +1,13 @@
-import { useContext } from "react";
+import axios from "axios";
+import { useContext, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
+
+import { UserContext } from "../App";
 import { BlogContext } from "../pages/blog.page";
+import Button from "./Button";
 
 import { CommentIcon, FacebookIcon, LikedIcon, LikeIcon } from "../Icons";
-
-import axios from "axios";
-import { useEffect } from "react";
-import { UserContext } from "../App";
-import Button from "./Button";
 
 /*
 | Phần         | Mục đích                                                                   |
@@ -35,6 +34,10 @@ const BlogInteraction = () => {
     setBlog,
     isLikedByUser,
     setIsLikedByUser,
+    commentsWrapper,
+    setCommentsWrapper,
+    totalParentCommentsLoaded,
+    setTotalParentCommentsLoaded,
   } = useContext(BlogContext);
 
   const {
@@ -89,13 +92,12 @@ const BlogInteraction = () => {
     setBlog({ ...blog, activity: { ...activity, total_likes: updatedLikes } });
 
     try {
-
       // Gửi yêu cầu lên server để cập nhật trạng thái like
       await axios.post(
         import.meta.env.VITE_SERVER_DOMAIN + "/like-blog",
         {
           _id,
-          isLikedByUser,   // Truyền trạng thái cũ để backend biết là Like hay Unlike
+          isLikedByUser, // Truyền trạng thái cũ để backend biết là Like hay Unlike
         },
         {
           headers: {
@@ -135,7 +137,10 @@ const BlogInteraction = () => {
 
           <p className="text-sm text-dark-grey">{total_likes}</p>
 
-          <Button className=" w-8 h-8 bg-grey/80 rounded-full flex items-center justify-center">
+          <Button
+            onClick={() => setCommentsWrapper((prevValue) => !prevValue)}
+            className=" w-8 h-8 bg-grey/80 rounded-full flex items-center justify-center"
+          >
             <CommentIcon className="text-dark-grey w-4 h-4 " />
           </Button>
 
