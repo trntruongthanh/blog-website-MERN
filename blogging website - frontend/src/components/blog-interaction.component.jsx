@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import { UserContext } from "../App";
 import { BlogContext } from "../pages/blog.page";
-import Button from "./Button";
+import Button from "./button";
 
 import { CommentIcon, FacebookIcon, LikedIcon, LikeIcon } from "../Icons";
 
@@ -36,8 +36,6 @@ const BlogInteraction = () => {
     setIsLikedByUser,
     commentsWrapper,
     setCommentsWrapper,
-    totalParentCommentsLoaded,
-    setTotalParentCommentsLoaded,
   } = useContext(BlogContext);
 
   const {

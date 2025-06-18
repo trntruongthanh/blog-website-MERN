@@ -13,6 +13,8 @@ import BlogPostCard from "../components/blog-post.component";
 import BlogContent from "../components/blog-content.component";
 import CommentContainer from "../components/comments.component";
 
+import fetchComments from "../components/fetchInteraction/fetchComments";
+
 export const blogStructure = {
   title: "",
   des: "",
@@ -25,9 +27,9 @@ export const blogStructure = {
 export const BlogContext = createContext({});
 
 const BlogPage = () => {
-  const { blog_id } = useParams();  // Lấy blog_id từ URL
+  const { blog_id } = useParams(); // Lấy blog_id từ URL
 
-  const [blog, setBlog] = useState(blogStructure);   // State lưu blog hiện tại
+  const [blog, setBlog] = useState(blogStructure); // State lưu blog hiện tại
 
   const [similarBlogs, setSimilarBlogs] = useState(null);
 
@@ -37,8 +39,8 @@ const BlogPage = () => {
 
   const [commentsWrapper, setCommentsWrapper] = useState(true);
 
-  const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0);
- 
+  const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0); //  để cập nhật số lượng comment cha đã tải.
+
   const {
     title,
     content,
@@ -64,7 +66,15 @@ const BlogPage = () => {
         return;
       }
 
-      console.log(blog.content);
+      blog.comments = await fetchComments({
+        blog_id: blog._id,
+        setParentCommentCountFun: setTotalParentCommentsLoaded,
+      });
+
+      // console.log(blog);
+
+      // console.log(blog.content);
+
       setBlog(blog); // Cập nhật ngay khi fetch được blog
 
       /*
@@ -81,9 +91,9 @@ const BlogPage = () => {
         } = await axios.post(
           import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs",
           {
-            tag: blog.tags[0],          // Lọc theo tag đầu tiên của blog hiện tại
-            limit: 6,                   // Giới hạn kết quả tối đa là 6 blog
-            eliminate_blog: blog_id,    // Không lấy chính blog hiện tại
+            tag: blog.tags[0], // Lọc theo tag đầu tiên của blog hiện tại
+            limit: 6, // Giới hạn kết quả tối đa là 6 blog
+            eliminate_blog: blog_id, // Không lấy chính blog hiện tại
           }
         );
 
@@ -133,7 +143,6 @@ const BlogPage = () => {
         <Loader />
       ) : (
         <BlogContext.Provider value={value}>
-          
           <CommentContainer />
 
           <div className="max-w-[900px] center py-10 max-lg:px-[-5vw]">
@@ -208,7 +217,6 @@ const BlogPage = () => {
               ""
             )}
           </div>
-
         </BlogContext.Provider>
       )}
     </AnimationWrapper>

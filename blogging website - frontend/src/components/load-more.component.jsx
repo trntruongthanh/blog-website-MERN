@@ -1,4 +1,4 @@
-import Button from "./Button";
+import Button from "./button";
 
 /**
   state != null: Đảm bảo đã có dữ liệu blog hiện tại.

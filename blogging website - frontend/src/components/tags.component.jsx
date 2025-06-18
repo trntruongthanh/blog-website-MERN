@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { CrossMallIcon } from "../Icons";
-import Button from "./Button";
+import Button from "./button";
 import { EditorContext } from "../pages/editor.pages";
 import toast from "react-hot-toast";
 

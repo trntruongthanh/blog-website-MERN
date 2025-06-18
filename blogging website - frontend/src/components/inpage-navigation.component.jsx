@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "./Button";
+import Button from "./button";
 
 /*
   ref trong React dùng để truy cập trực tiếp đến một DOM element hoặc một React component.

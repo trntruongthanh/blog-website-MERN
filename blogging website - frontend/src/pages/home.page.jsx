@@ -6,7 +6,7 @@ import Loader from "../components/loader.component";
 
 import { ArrowUpIcon } from "../Icons";
 
-import Button from "../components/Button";
+import Button from "../components/button";
 import InPageNavigation from "../components/inpage-navigation.component";
 import BlogPostCard from "../components/blog-post.component";
 import MinimalBlogPost from "../components/nobanner-blog-post.component";

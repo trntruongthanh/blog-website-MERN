@@ -1,17 +1,33 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { BlogContext } from "../pages/blog.page";
 
-import Button from "./Button";
+import Button from "./button";
 import { CrossMallIcon } from "../Icons";
 
+import AnimationWrapper from "../common/page-animation";
+import NoDataMessage from "./nodata.component";
+
 import CommentField from "./comment-field.component";
+import CommentCard from "./comment-card.component";
+
+/*
+  comment: nội dung text người dùng đang nhập.
+  comments: object chứa các thông tin liên quan đến comment trong blog.
+  commentsArr: mảng chứa các comment đã được load (hiển thị trong UI).
+*/
 
 const CommentContainer = () => {
   const {
-    blog: { title },
+    blog,
+    blog: {
+      title,
+      comments: { results: commentsArr },
+    },
     commentsWrapper,
     setCommentsWrapper,
   } = useContext(BlogContext);
+
+  console.log(commentsArr);
 
   /*
   
@@ -27,6 +43,11 @@ const CommentContainer = () => {
     Cuộn dọc nếu nội dung dài
     Không cuộn ngang
   */
+
+  // useEffect(() => {
+  //   console.log("Blog:", blog);
+  // }, [blog]);
+
   return (
     <div
       className={
@@ -50,8 +71,24 @@ const CommentContainer = () => {
       </div>
 
       <hr className="border-grey my-8 w-[140%] -ml-10" />
-      
+
       <CommentField action="comment" />
+
+      {commentsArr && commentsArr.length ? (
+        commentsArr.map((comment, index) => {
+          return (
+            <AnimationWrapper key={index}>
+              <CommentCard
+                index={index}
+                leftValue={comment.childrenLevel * 4}
+                commentData={comment}
+              />
+            </AnimationWrapper>
+          );
+        })
+      ) : (
+        <NoDataMessage message="No Comments" />
+      )}
     </div>
   );
 };

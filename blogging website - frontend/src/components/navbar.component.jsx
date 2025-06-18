@@ -6,7 +6,7 @@ import { UserContext } from "../App";
 import images from "../assets/imgs/images";
 import { BellIcon, FileEditIcon } from "../Icons";
 
-import Button from "./Button";
+import Button from "./button";
 import UserNavigationPanel from "./user-navigation.component";
 
 const Navbar = () => {

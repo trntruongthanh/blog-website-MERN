@@ -8,7 +8,7 @@ import { UserContext } from "../App";
 
 import { CrossMallIcon } from "../Icons";
 import AnimationWrapper from "../common/page-animation";
-import Button from "./Button";
+import Button from "./button";
 import images from "../assets/imgs/images";
 import Tag from "./tags.component";
 
