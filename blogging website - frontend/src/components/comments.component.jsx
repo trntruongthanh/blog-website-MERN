@@ -9,6 +9,7 @@ import NoDataMessage from "./nodata.component";
 
 import CommentField from "./comment-field.component";
 import CommentCard from "./comment-card.component";
+import fetchComments from "./fetchInteraction/fetchComments";
 
 /*
   comment: nội dung text người dùng đang nhập.
@@ -20,17 +21,21 @@ const CommentContainer = () => {
   const {
     blog,
     blog: {
+      _id,
       title,
       comments: { results: commentsArr },
+      activity: { total_parent_comments },
     },
     commentsWrapper,
     setCommentsWrapper,
+    totalParentCommentsLoaded,
+    setTotalParentCommentsLoaded,
+    setBlog,
   } = useContext(BlogContext);
 
-  console.log(commentsArr);
+  // console.log(commentsArr);
 
   /*
-  
     Khi commentsWrapper là true: phần tử được hiển thị
     Mobile: top-0 → đặt ở đầu màn hình
     Desktop: right-0 → khớp cạnh phải
@@ -42,11 +47,28 @@ const CommentContainer = () => {
     overflow-y-auto overflow-x-hidden
     Cuộn dọc nếu nội dung dài
     Không cuộn ngang
+  
   */
 
   // useEffect(() => {
   //   console.log("Blog:", blog);
   // }, [blog]);
+
+  const loadMoreComments = async () => {
+    let newCommentsArr = await fetchComments({
+      skip: totalParentCommentsLoaded,
+      blog_id: _id,
+      setParentCommentCountFun: setTotalParentCommentsLoaded,
+      comment_array: commentsArr,
+    });
+
+    setBlog({
+      ...blog,
+      comments: newCommentsArr,
+    });
+  };
+
+  //=======================================================================================
 
   return (
     <div
@@ -88,6 +110,17 @@ const CommentContainer = () => {
         })
       ) : (
         <NoDataMessage message="No Comments" />
+      )}
+
+      {total_parent_comments > totalParentCommentsLoaded ? (
+        <Button
+          onClick={loadMoreComments}
+          className="text-dark-grey mt-4 p-2 px-3 border border-grey rounded-md flex items-center gap-2"
+        >
+          Load More
+        </Button>
+      ) : (
+        " "
       )}
     </div>
   );

@@ -7,7 +7,6 @@ import { UserContext } from "../App";
 import { BlogContext } from "../pages/blog.page";
 
 import Button from "./button";
-import { useEffect } from "react";
 
 /*
   User->>Frontend: Click "Post Comment"
@@ -28,14 +27,22 @@ import { useEffect } from "react";
   commentsArr: mảng chứa các comment đã được load (hiển thị trong UI).
 */
 
-const CommentField = ({ action }) => {
+const CommentField = ({
+  action,
+  index = undefined,
+  replyingTo = undefined,
+  setIsReplying,
+}) => {
   const {
     userAuth: { access_token, username, fullname, profile_img },
   } = useContext(UserContext);
 
   const {
     blog,
-    blog: { comments, comments: { results: commentsArr } },
+    blog: {
+      comments,
+      comments: { results: commentsArr },
+    },
     setBlog,
     activity,
     setTotalParentCommentsLoaded,
@@ -43,8 +50,11 @@ const CommentField = ({ action }) => {
 
   const _id = blog?._id;
   const blog_author = blog?.author?._id;
+
   const total_comments = activity?.total_comments ?? 0;
   const total_parent_comments = activity?.total_parent_comments ?? 0;
+
+  //========================================================================================
 
   // console.log(blog);
   // console.log(commentsArr);
@@ -75,6 +85,7 @@ const CommentField = ({ action }) => {
           _id,
           blog_author,
           comment,
+          replying_to: replyingTo,
         },
         {
           headers: {
@@ -83,19 +94,62 @@ const CommentField = ({ action }) => {
         }
       );
 
-      // console.log(data)
+      // console.log(data);
 
-      setComment("");
+      setComment("");   // Reset khung nhập sau khi gửi thành công
 
+      
+      //📦 Server chỉ trả về ID người comment, nên ta thêm thủ công thông tin user hiện tại để render avatar/tên trong UI mà không cần fetch thêm.
+      
       data.commented_by = {
         personal_info: { username, fullname, profile_img },
       };
 
       let newCommentArr;
 
-      data.childrenLevel = 0;
+      /* Có tồn tại replyingTo nghĩa là user đang phản hồi (reply) một comment khác 
 
-      newCommentArr = [data, ...commentsArr];
+        Thêm ID của reply mới vào mảng children của comment cha (được xác định bằng index trong mảng commentsArr). 
+        Điều này giúp xây được mối quan hệ cha - con trong UI.
+
+        Xác định cấp độ hiển thị của reply (ví dụ để canh lề trái).
+        Nếu comment cha đang ở cấp độ 0 → reply sẽ ở cấp độ 1 → có thể dùng để indent trong UI.
+      
+        Ghi lại chỉ số index của comment cha → giúp sau này có thể tìm lại comment cha nếu cần (ví dụ khi collapse reply, cập nhật reply, v.v.)
+      
+        Đánh dấu comment cha đã load reply → giúp kiểm soát hiển thị (ví dụ tránh gọi API lại nữa).
+
+        index + 1 → chèn ngay sau comment cha
+        0 → không xóa phần tử nào
+        data → là comment mới (reply)
+
+        Gán lại mảng mới đã được cập nhật để dùng trong setBlog
+      
+        */
+      if (replyingTo) {
+        commentsArr[index].children.push(data._id);   
+
+        data.childrenLevel = commentsArr[index].childrenLevel + 1;
+        data.parentIndex = index;
+
+        commentsArr[index].isReplyLoaded = true;
+
+        commentsArr.splice(index + 1, 0, data);       // array.splice(start, deleteCount, item1, item2, ...)
+
+        newCommentArr = commentsArr;
+
+        setIsReplying(false);
+
+      } else {
+
+        /* Trường hợp là Comment cha (else) 
+          Đây là comment trực tiếp vào blog (không phải reply), nên cấp độ = 0
+          Thêm comment mới vào đầu danh sách comment cha (vì thường mới nhất sẽ hiển thị trước
+        */
+        data.childrenLevel = 0;
+
+        newCommentArr = [data, ...commentsArr];
+      }
 
       let parentCommentIncrementVal = 1;
 
@@ -108,7 +162,8 @@ const CommentField = ({ action }) => {
         activity: {
           ...activity,
           total_comments: total_comments + 1,
-          total_parent_comments: total_parent_comments + parentCommentIncrementVal,
+          total_parent_comments:
+            total_parent_comments + parentCommentIncrementVal,
         },
       });
 
@@ -144,7 +199,7 @@ const CommentField = ({ action }) => {
         onClick={handleComment}
         disabled={!hasComment}
         className={clsx(
-          "mt-5 border border-lavender bg-white text-black px-4 py-2 rounded-md",
+          "mt-2 mb-4 border border-lavender bg-white text-black px-4 py-2 rounded-md",
           {
             "btn-shadow hover:bg-gray-200": hasComment,
           }

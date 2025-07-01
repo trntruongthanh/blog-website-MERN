@@ -75,7 +75,7 @@ const BlogPage = () => {
 
       // console.log(blog.content);
 
-      setBlog(blog); // Cập nhật ngay khi fetch được blog
+      setBlog(blog);      // Cập nhật ngay khi fetch được blog
 
       /*
         💡 Mục đích
@@ -91,18 +91,20 @@ const BlogPage = () => {
         } = await axios.post(
           import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs",
           {
-            tag: blog.tags[0], // Lọc theo tag đầu tiên của blog hiện tại
-            limit: 6, // Giới hạn kết quả tối đa là 6 blog
-            eliminate_blog: blog_id, // Không lấy chính blog hiện tại
+            tag: blog.tags[0],        // Lọc theo tag đầu tiên của blog hiện tại
+            limit: 6,                 // Giới hạn kết quả tối đa là 6 blog
+            eliminate_blog: blog_id,  // Không lấy chính blog hiện tại
           }
         );
 
         setSimilarBlogs(blogs);
+        
       } catch (error) {
         console.log(error);
       }
 
       setLoading(false);
+
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -199,6 +201,7 @@ const BlogPage = () => {
                   Similar Blogs
                 </h1>
                 {similarBlogs.map((blog, index) => {
+                  
                   let {
                     author: { personal_info },
                   } = blog;
