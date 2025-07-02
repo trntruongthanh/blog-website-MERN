@@ -34,6 +34,15 @@ export const fetchComments = async ({
     /*
       Cập nhật số lượng comment cha đã load bằng cách tăng preVal (giá trị hiện tại) thêm comments.length (số lượng comment vừa fetch được).
       Lưu ý: nên dùng `comments.length` thay vì `data.length` cho chính xác
+
+      comments.length là số lượng comment cha mới load được.
+      Cộng thêm vào totalParentCommentsLoaded.
+
+      cập nhật state dựa trên giá trị trước đó
+      preVal là giá trị hiện tại của totalParentCommentsLoaded.
+      comments.length là số lượng comment cha vừa fetch được từ server.
+      cập nhật state mới bằng cách cộng thêm số lượng comment vừa load:
+      newValue = oldValue + comments.length
     */
     setParentCommentCountFun((preVal) => preVal + comments.length);
 

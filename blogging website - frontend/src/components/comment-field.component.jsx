@@ -162,8 +162,7 @@ const CommentField = ({
         activity: {
           ...activity,
           total_comments: total_comments + 1,
-          total_parent_comments:
-            total_parent_comments + parentCommentIncrementVal,
+          total_parent_comments: total_parent_comments + parentCommentIncrementVal,
         },
       });
 

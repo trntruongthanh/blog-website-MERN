@@ -128,6 +128,15 @@ const BlogPage = () => {
 
   // =======================================================================================
 
+  /*
+    commentsWrapper: boolean Quyết định xem phần hiển thị comment (panel) có đang hiển thị hay bị ẩn.
+    Toggle UI hiển thị comment bên cạnh (slide-in / slide-out).
+
+    totalParentCommentsLoaded: number Đếm số lượng comment cha (cấp 0) đã được load vào U
+    Xác định skip cho lần gọi API tiếp theo khi nhấn "Load More".
+    So sánh với total_parent_comments để biết có còn comment chưa load không.
+
+  */
   const value = {
     blog,
     setBlog,
@@ -202,9 +211,9 @@ const BlogPage = () => {
                 </h1>
                 {similarBlogs.map((blog, index) => {
                   
-                  let {
-                    author: { personal_info },
-                  } = blog;
+                  // let {
+                  //   author: { personal_info },
+                  // } = blog;
 
                   return (
                     <AnimationWrapper

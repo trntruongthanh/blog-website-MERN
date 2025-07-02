@@ -56,7 +56,7 @@ const CommentContainer = () => {
 
   const loadMoreComments = async () => {
     let newCommentsArr = await fetchComments({
-      skip: totalParentCommentsLoaded,
+      skip: totalParentCommentsLoaded,          // bỏ qua n comment đã tải
       blog_id: _id,
       setParentCommentCountFun: setTotalParentCommentsLoaded,
       comment_array: commentsArr,
