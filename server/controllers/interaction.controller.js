@@ -2,6 +2,8 @@ import Blog from "../Schema/Blog.js";
 import Notification from "../Schema/Notification.js";
 import Comment from "../Schema/Comment.js";
 
+import deleteComments from "../features/comments/deleteComments.js";
+
 // 📌 API xử lý khi người dùng like / unlike blog
 export const likeBlogInteraction = async (req, res) => {
   // ID của user đang đăng nhập (được lấy từ middleware xác thực)
@@ -290,7 +292,7 @@ export const getReplies = async (req, res) => {
           skip: skip,                 // 3️⃣ Bỏ qua skip replies đầu tiên
           sort: { commentedAt: -1 },  // 4️⃣ Sắp xếp mới nhất trước
         },
-        populate: {                     
+        populate: {
           path: "commented_by",       // 5️⃣ Populate lồng: lấy thông tin user của từng reply
           select:
             "personal_info.profile_img personal_info.fullname personal_info.username",
@@ -302,6 +304,44 @@ export const getReplies = async (req, res) => {
     return res.status(200).json({ replies: doc.children });
     
   } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//==========================================================================================================
+
+export const deleteComment = async (req, res) => {
+  let user_id = req.user;
+
+  let { _id } = req.body;
+
+  /*
+    1. Tìm comment cần xóa trong database theo _id.
+      → comment là một document kiểu Mongoose lấy ra từ Comment collection.
+    
+    2.
+    | Điều kiện                          | Ý nghĩa                                                    |
+    | ---------------------------------- | ---------------------------------------------------------- |
+    | `user_id === comment.commented_by` | Nếu bạn là **người đã viết comment đó** → được xóa         |
+    | `user_id === comment.blog_author`  | Nếu bạn là **tác giả của blog chứa comment đó** → được xóa |
+
+    toString() để so sánh ID dạng ObjectId chính xác hơn (tránh lỗi type mismatch).
+  
+  */
+
+  try {
+    let comment = await Comment.findOne({ _id });
+
+    if (user_id.toString() === comment.commented_by.toString() || user_id.toString() === comment.blog_author.toString()) {
+      await deleteComments(_id);
+
+      return res.status(200).json({ status: "done" });
+    } else {
+      return res.status(403).json({ error: "You can not delete this comment" });
+    }
+  } catch (error) {
+
     console.log(error.message);
     return res.status(500).json({ error: error.message });
   }

@@ -6,15 +6,23 @@ import { UserContext } from "../App";
 import { formatDateOnly } from "../common/date";
 import Button from "./button";
 import CommentField from "./comment-field.component";
-import { CommentIcon } from "../Icons";
+import { CommentIcon, TrashIcon } from "../Icons";
 import { BlogContext } from "../pages/blog.page";
 import axios from "axios";
 
 const CommentCard = ({ index, leftValue, commentData }) => {
+  /*
+  | Thuộc tính    | `commentsArr`                                       | `commentData`                         |
+  | ------------- | --------------------------------------------------- | ------------------------------------- |
+  | Loại          | Mảng (array)                                        | Đối tượng (object)                    |
+  | Vai trò       | Danh sách tất cả comment đang hiển thị trên blog UI | Một comment cụ thể trong danh sách đó |
+  | Nguồn dữ liệu | `blog.comments.results`                             | Một phần tử trong `commentsArr`       |
+  | Dùng để       | Lặp qua để render UI, thao tác cập nhật xóa chèn    | Render ra một `CommentCard` cụ thể    |
+  */
 
   let {
     commented_by: {
-      personal_info: { fullname, username, profile_img },
+      personal_info: { fullname, username: commented_by_username, profile_img },
     },
     _id,
     comment,
@@ -25,22 +33,25 @@ const CommentCard = ({ index, leftValue, commentData }) => {
   let {
     blog: {
       comments,
+      activity,
+      activity: { total_parent_comments },
       comments: { results: commentsArr },
+      author: { username: blog_author },
     },
     blog,
     setBlog,
+    setTotalParentCommentsLoaded,
   } = useContext(BlogContext);
 
   let {
-    userAuth: { access_token },
+    userAuth: { access_token, username },
   } = useContext(UserContext);
 
   const [isReplying, setIsReplying] = useState(false);
 
   const replyRef = useRef(null);
 
-
-  // =======================================================================================
+  // ================================================================================================================================================
 
   // Toggle form trả lời
   const handleReply = () => {
@@ -84,13 +95,36 @@ const CommentCard = ({ index, leftValue, commentData }) => {
     };
   }, [isReplying]);
 
+  // ================================================================================================================================================
 
-  // =======================================================================================
+  /*
+    Tìm vị trí (index) của comment cha gần nhất trong mảng commentsArr, dựa trên childrenLevel.
+    | Mục tiêu                          | Hành động                                          |
+    | --------------------------------- | -------------------------------------------------- |
+    | Tìm comment cha gần nhất          | Lùi về từng phần tử trước đó                       |
+    | So sánh `childrenLevel`           | Nếu `>=` → tiếp tục lùi lại (vì nó không phải cha) |
+    | Nếu `<` → tìm thấy cha            | Dừng vòng lặp và trả về index                      |
+    | Nếu lùi ra ngoài mảng (index < 0) | Bị lỗi → vào `catch` → trả về `undefined`          |
+  
+  */
+  const getParentIndex = () => {
+    let startingPoint = index - 1;
 
-  // Xóa các reply con khi hide
-  const removeCommentsCards = (startingPoint) => {
+    try {
+      while (commentsArr[startingPoint].childrenLevel >= commentData.childrenLevel) {
+        startingPoint--;
+      }
+    } catch {
+      startingPoint = undefined;
+    }
 
-    /*
+    return startingPoint;
+  };
+
+  // ================================================================================================================================================
+
+  /*
+  Xóa các reply con khi hide
       Xoá hết tất cả comment con có childrenLevel lớn hơn comment cha (commentData) bắt đầu từ startingPoint.
 
       Kiểm tra xem có comment nào bắt đầu từ startingPoint (tức là index + 1 trong hideReplies) không.
@@ -119,13 +153,32 @@ const CommentCard = ({ index, leftValue, commentData }) => {
       splice(1, 1) → xoá A1
       mảng còn: ["A", "A2", "B"]
       A2 dịch lên vị trí 1
+
       không tăng startingPoint → vẫn tiếp tục kiểm tra commentsArr[1] (chính là A2)
       Nếu bạn tăng startingPoint, bạn sẽ bỏ qua A2 → bug ⚠️
 
-    */
+
+      | Tiêu chí                   | Đoạn 1 – Xoá các comment con reply           | Đoạn 2 – Xoá chính comment hiện tại (nếu isDelete) |
+      | -------------------------- | -------------------------------------------- | -------------------------------------------------- |
+      | Mục đích                   | Xoá **các reply cấp dưới** (cháu, chắt...)   | Xoá **chính comment đang được xoá**                |
+      | Dùng khi nào               | Khi `hideReplies()` hoặc `isDelete === true` | Chỉ khi `isDelete === true`                        |
+      | Duyệt nhiều comment không? | ✅ Có, xoá theo `while`                       | ❌ Không, chỉ `splice(index, 1)`                    |
+      | Cập nhật cha               | ❌ Không xử lý comment cha                    | ✅ Có cập nhật `children[]` và `isReplyLoaded`      |
+      | Thứ tự gọi                 | Chạy TRƯỚC đoạn 2 (nếu isDelete)             | Gọi SAU để xoá chính comment                       |
+      
+      | Tình huống      | Đoạn nào chạy?                | Diễn giải                                                                  |
+      | --------------- | ----------------------------- | -------------------------------------------------------------------------- |
+      | Ẩn replies      | Chạy **chỉ đoạn 1**           | Xoá replies khỏi UI tạm thời                                               |
+      | Xoá comment con | Chạy đoạn 2 (isDelete = true) | Xoá chính nó, cập nhật `children[]` của cha                                |
+      | Xoá comment cha | Chạy đoạn 1 ➝ rồi đoạn 2      | Đoạn 1: xoá các con, đoạn 2: xoá chính cha và cập nhật cha cấp trên nếu có |
+  */
+  const removeCommentsCards = (startingPoint, isDelete = false) => {
     if (commentsArr[startingPoint]) {
+      /*
+          So sánh comment tại startingPoint với comment hiện tại (commentData)
+          Gặp comment không phải là reply nữa ( childrenLevel <= ) Hoặc hết mảng
+      */
       while (commentsArr[startingPoint].childrenLevel > commentData.childrenLevel) {
-        
         commentsArr.splice(startingPoint, 1);
 
         if (!commentsArr[startingPoint]) {
@@ -134,35 +187,69 @@ const CommentCard = ({ index, leftValue, commentData }) => {
       }
     }
 
+    /*
+      Kiểm tra xem đây có phải là thao tác xoá comment (thật sự) hay không.
+      Nếu là true, tiến hành các bước xử lý xoá (chứ không chỉ "ẩn reply").
+      Chỉ xử lý chính comment hiện tại đang bị xoá
+      Dùng chỉ khi thật sự xoá (isDelete = true)
+
+      Tìm cha của comment này (nếu có)
+      Qua getParentIndex()
+      Cập nhật cha:
+      Xoá _id của comment hiện tại ra khỏi children[] của cha
+      Reset lại isReplyLoaded = false để khi load lại sẽ fetch đúng
+      Xoá chính comment hiện tại khỏi commentsArr
+    */
+    if (isDelete) {
+      let parentIndex = getParentIndex();
+
+      if (parentIndex !== undefined) {
+        commentsArr[parentIndex].children = commentsArr[parentIndex].children.filter((child) => child !== _id);
+
+        if (commentsArr[parentIndex].children.length) {
+          commentsArr[parentIndex].isReplyLoaded = false;
+        }
+      }
+
+      commentsArr.splice(index, 1);
+    }
+
+    if (commentData.childrenLevel === 0 && isDelete) {
+      setTotalParentCommentsLoaded((prev) => prev - 1);
+    }
+
     setBlog({
       ...blog,
       comments: { results: commentsArr },
+      activity: {
+        ...activity,
+        total_comments: activity.total_comments - 1,
+        total_parent_comments:
+          total_parent_comments -
+          (commentData.childrenLevel === 0 && isDelete ? 1 : 0),
+      },
     });
   };
 
-
-  // Reset lại trạng thái
-  const hideReplies = () => {
-
-    /*
+  /*
+    Reset lại trạng thái
       | Giá trị                                                                             | Ý nghĩa                                                  |
       | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
       | `index`                                                                             | vị trí của comment hiện tại (comment cha)                |
       | `index + 1`                                                                         | vị trí bắt đầu của các comment con cần kiểm tra và xoá   |
       | `childrenLevel`                                                                     | mức độ "sâu" của comment trong cây reply                 |
       | Dùng `while (commentsArr[startingPoint].childrenLevel > commentData.childrenLevel)` | để biết khi nào dừng (gặp comment không phải là con nữa) |
-    */
+  */
+  const hideReplies = () => {
     commentData.isReplyLoaded = false;
 
     removeCommentsCards(index + 1);
   };
 
-  // =======================================================================================
+  // ================================================================================================================================================
 
   // Gọi API để lấy reply và chèn vào commentsArr
-  const loadReplies = async ({ skip = 0 }) => {
-
-    /*
+  /*
       Nếu nhấn lại lần nữa, mà kh xoá replies cũ → thì sẽ:
       bị trùng comment con trong mảng commentsArr
       Hiển thị các reply cũ lặp lại
@@ -182,7 +269,8 @@ const CommentCard = ({ index, leftValue, commentData }) => {
       Lần đầu gọi: skip = 0 → lấy 5 replies đầu
       Lần sau gọi: skip = 5 → lấy tiếp từ reply thứ 6 đến 10
 
-    */
+  */
+  const loadReplies = async ({ skip = 0 }) => {
     if (children.length) {
       hideReplies();
 
@@ -194,10 +282,9 @@ const CommentCard = ({ index, leftValue, commentData }) => {
           { _id, skip }
         );
 
-        commentData.isReplyLoaded = true;     // Gắn flag cho comment này là đã load replies
+        commentData.isReplyLoaded = true; // Gắn flag cho comment này là đã load replies
 
         for (let i = 0; i < replies.length; i++) {
-
           /*
             commentData.childrenLevel là level của comment cha (ví dụ: 0 là comment gốc)
             replies[i].childrenLevel = cha + 1 → là cấp độ của reply (con)
@@ -235,7 +322,35 @@ const CommentCard = ({ index, leftValue, commentData }) => {
     }
   };
 
-  //=================================================================================================
+  // ================================================================================================================================================
+
+  const deleteComment = async (event) => {
+    const btn = event.currentTarget;
+    btn.setAttribute("disabled", true); // Ngăn spam click
+
+    try {
+      await axios.post(
+        import.meta.env.VITE_SERVER_DOMAIN + "/delete-comment",
+        { _id },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      removeCommentsCards(index + 1, true); // Gọi hàm xoá ở frontend (isDelete = true
+    } catch (error) {
+
+      console.log(error);
+      toast.error("Failed to delete comment.");
+
+    } finally {
+      btn.removeAttribute("disabled");
+    }
+  };
+
+  // ==============================================================================================================================================================
 
   return (
     <div className="w-full" style={{ paddingLeft: `${leftValue * 10}px` }}>
@@ -243,7 +358,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
         <div className="flex gap-3 items-center mb-8">
           <img src={profile_img} className="w-6 h-6 rounded-full" />
           <p className="line-clamp-1">
-            {fullname} @{username}
+            {fullname} @{commented_by_username}
           </p>
           <p className="min-w-fit">{formatDateOnly(commentedAt)}</p>
         </div>
@@ -256,7 +371,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
               onClick={hideReplies}
               className="text-sm flex items-center p-2 px-2 gap-2 rounded-md"
             >
-              <CommentIcon className="w-4 h-4" /> Hide Reply
+              <CommentIcon className="w-4 h-4" /> Hide
             </Button>
           ) : (
             <Button
@@ -275,6 +390,17 @@ const CommentCard = ({ index, leftValue, commentData }) => {
               Reply
             </Button>
           )}
+
+          {username === commented_by_username || username === blog_author ? (
+            <Button
+              onClick={deleteComment}
+              className="p-2 px-2 rounded-md ml-auto hover:bg-red/30 hover:text-red flex items-center"
+            >
+              <TrashIcon className="w-4 h-4 pointer-events-none" />
+            </Button>
+          ) : (
+            ""
+          )}
         </div>
 
         {isReplying && (
@@ -287,7 +413,6 @@ const CommentCard = ({ index, leftValue, commentData }) => {
             />
           </div>
         )}
-        
       </div>
     </div>
   );

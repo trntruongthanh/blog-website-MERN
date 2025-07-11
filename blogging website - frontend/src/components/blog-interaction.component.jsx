@@ -120,7 +120,7 @@ const BlogInteraction = () => {
           {isLikedByUser ? (
             <Button
               onClick={handleLike}
-              className="hover:bg-pink-pastel w-8 h-8 bg-red/20 rounded-full flex items-center justify-center"
+              className="hover:bg-pink-pastel gap-1 w-8 h-8 bg-red/20 rounded-full flex items-center justify-center"
             >
               <LikedIcon className="text-red w-4 h-4 " />
             </Button>

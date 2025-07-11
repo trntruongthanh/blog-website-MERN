@@ -67,6 +67,7 @@ Dung findById() Tìm document theo _id.
 | `$or`     | Một trong nhiều điều kiện                       |
 | `$nor`    | **Không** thuộc bất kỳ điều kiện nào            |
 | `$not`    | Phủ định một điều kiện                          |
+| `$pull`   | Loại bỏ một (hoặc nhiều) phần tử khỏi mảng mà khớp với giá trị hoặc điều kiện cụ thể.                        |
 
 
 | Phương thức     | Công dụng                                                            |

@@ -16,6 +16,7 @@ import {
   WebsiteIcon,
   FacebookIcon,
   LikedIcon,
+  TrashIcon,
 } from "./icon";
 
 export const ICONS = {
@@ -27,6 +28,7 @@ export const ICONS = {
   showEyeIcon: ShowEyeIcon,
   bellIcon: BellIcon,
   crossMallIcon: CrossMallIcon,
+  trashIcon: TrashIcon,
   likeIcon: LikeIcon,
   likedIcon: LikedIcon,
   commentIcon: CommentIcon,

@@ -96,11 +96,10 @@ const CommentField = ({
 
       // console.log(data);
 
-      setComment("");   // Reset khung nhập sau khi gửi thành công
+      setComment(""); // Reset khung nhập sau khi gửi thành công
 
-      
       //📦 Server chỉ trả về ID người comment, nên ta thêm thủ công thông tin user hiện tại để render avatar/tên trong UI mà không cần fetch thêm.
-      
+
       data.commented_by = {
         personal_info: { username, fullname, profile_img },
       };
@@ -125,23 +124,21 @@ const CommentField = ({
 
         Gán lại mảng mới đã được cập nhật để dùng trong setBlog
       
-        */
+      */
       if (replyingTo) {
-        commentsArr[index].children.push(data._id);   
+        commentsArr[index].children.push(data._id);
 
         data.childrenLevel = commentsArr[index].childrenLevel + 1;
         data.parentIndex = index;
 
         commentsArr[index].isReplyLoaded = true;
 
-        commentsArr.splice(index + 1, 0, data);       // array.splice(start, deleteCount, item1, item2, ...)
+        commentsArr.splice(index + 1, 0, data); // array.splice(start, deleteCount, item1, item2, ...)
 
         newCommentArr = commentsArr;
 
         setIsReplying(false);
-
       } else {
-
         /* Trường hợp là Comment cha (else) 
           Đây là comment trực tiếp vào blog (không phải reply), nên cấp độ = 0
           Thêm comment mới vào đầu danh sách comment cha (vì thường mới nhất sẽ hiển thị trước
@@ -153,20 +150,63 @@ const CommentField = ({
 
       let parentCommentIncrementVal = 1;
 
-      setBlog({
-        ...blog,
-        comments: {
-          ...comments,
-          results: newCommentArr,
-        },
-        activity: {
-          ...activity,
-          total_comments: total_comments + 1,
-          total_parent_comments: total_parent_comments + parentCommentIncrementVal,
-        },
+      /*
+        Lý do có thể gây lỗi UI (mất total_likes hoặc dữ liệu khác)
+        blog, activity, hoặc comments có thể chưa có dữ liệu đầy đủ tại thời điểm gọi setBlog
+        Nếu activity lúc này là undefined (do đang loading hoặc chưa fetch xong), thì ...activity sẽ không có tác dụng, và bạn sẽ ghi đè activity thành { total_comments: ..., total_parent_comments: ... } → mất total_likes.
+        Cách viết này là "non-functional update"
+        Nó dùng trực tiếp giá trị hiện tại (blog, activity, comments) thay vì gọi lại hàm với giá trị trước đó (tức là prevBlog, prevComments, v.v.).
+        Điều này sẽ không phản ánh đúng trạng thái mới nhất nếu nhiều setState() gọi gần nhau hoặc trong async flow.
+
+        setBlog((prev) => ({
+          ...prev,
+          activity: {
+            ...prev.activity,
+            // chỉ update giá trị cần
+          },
+        }));
+
+
+        | Phần                                | Ý nghĩa                                                                     |
+        | ----------------------------------- | --------------------------------------------------------------------------- |
+        | `prevBlog.activity?.total_comments` | Truy cập `total_comments` **an toàn** (có thể undefined nếu chưa load xong) |
+        | `?? 0`                              | Nếu `total_comments` là `undefined` hoặc `null`, dùng `0` thay thế          |
+        | `+ 1`                               | Cộng thêm 1 vào kết quả (vì bạn đang thêm 1 comment mới)                    |
+
+        Nếu prevBlog.activity.total_comments đã tồn tại → lấy giá trị đó và cộng thêm 1.
+        Nếu prevBlog.activity.total_comments là undefined hoặc null (chưa có hoặc chưa load xong) → dùng 0 rồi cộng thêm 1.
+        
+        | `prevBlog.activity.total_comments` | Kết quả của `(prevBlog.activity?.total_comments ?? 0) + 1` |
+        | ---------------------------------- | ---------------------------------------------------------- |
+        | `5`                                | `5 + 1 = 6`                                                |
+        | `undefined`                        | `0 + 1 = 1`                                                |
+        | `null`                             | `0 + 1 = 1`                                                |
+
+
+        ?? chỉ check null và undefined,
+        || check mọi giá trị "falsy" như 0, '', false, NaN, null, undefined.
+      */
+
+      setBlog((prevBlog) => {
+        const total_comments = prevBlog.activity?.total_comments ?? 0;
+        const total_parent_comments = prevBlog.activity?.total_parent_comments ?? 0;
+
+        return {
+          ...prevBlog,
+          comments: {
+            ...prevBlog.comments,
+            results: newCommentArr,
+          },
+          activity: {
+            ...prevBlog.activity,
+            total_comments: total_comments + 1,
+            total_parent_comments: total_parent_comments + parentCommentIncrementVal,
+          },
+        };
       });
 
       setTotalParentCommentsLoaded((prev) => !prev + parentCommentIncrementVal);
+      
     } catch (error) {
       console.log(error);
     }

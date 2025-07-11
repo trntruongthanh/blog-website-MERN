@@ -6,7 +6,8 @@ import {
   likeBlogInteraction,
   addCommentInteraction,
   getBlogComments,
-  getReplies
+  getReplies,
+  deleteComment
 } from "../controllers/interaction.controller.js";
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.post("/isliked-by-user", verifyJWT, isLiked);
 router.post("/add-comment", verifyJWT, addCommentInteraction);
 router.post("/get-blog-comments", getBlogComments)
 router.post("/get-replies", getReplies)
+router.post("/delete-comment", verifyJWT, deleteComment)
 
 export default router;
