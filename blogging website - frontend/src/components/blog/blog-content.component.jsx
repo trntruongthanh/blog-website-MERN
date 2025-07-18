@@ -1,6 +1,6 @@
-import Img from "./rendering-content/Image/Img";
-import List from "./rendering-content/List/list";
-import Quote from "./rendering-content/Quote/quote";
+import Img from "../rendering-content/img";
+import List from "../rendering-content/list";
+import Quote from "../rendering-content/quote";
 
 /*
   dangerouslySetInnerHTML là một thuộc tính đặc biệt trong React được dùng để nhúng trực tiếp HTML vào một phần tử 

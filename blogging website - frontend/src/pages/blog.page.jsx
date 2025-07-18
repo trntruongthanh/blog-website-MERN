@@ -8,12 +8,12 @@ import AnimationWrapper from "../common/page-animation";
 import { formatDateOnly, formatTimeAgo } from "../common/date";
 import Loader from "../components/loader.component";
 
-import BlogInteraction from "../components/blog-interaction.component";
-import BlogPostCard from "../components/blog-post.component";
-import BlogContent from "../components/blog-content.component";
-import CommentContainer from "../components/comments.component";
+import BlogInteraction from "../components/blog/blog-interaction.component.jsx";
+import BlogPostCard from "../components/blog/blog-post.component.jsx";
+import BlogContent from "../components/blog/blog-content.component.jsx";
+import CommentContainer from "../components/interaction/comments/comments.component.jsx";
 
-import fetchComments from "../components/fetchInteraction/fetchComments";
+import fetchComments from "../utils/fetchInteraction/fetchComments.js";
 
 export const blogStructure = {
   title: "",

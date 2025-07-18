@@ -9,7 +9,7 @@ import Loader from "../components/loader.component";
 import AboutUser from "../components/about.component";
 import filterPaginationData from "../common/filter-pagination-data";
 import InPageNavigation from "../components/inpage-navigation.component";
-import BlogPostCard from "../components/blog-post.component";
+import BlogPostCard from "../components/blog/blog-post.component";
 import NoDataMessage from "../components/nodata.component";
 import LoadMoreDataBtn from "../components/load-more.component";
 import PageNotFound from "./404.page";

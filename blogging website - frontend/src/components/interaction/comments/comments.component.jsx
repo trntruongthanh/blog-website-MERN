@@ -1,15 +1,15 @@
-import { useContext, useEffect } from "react";
-import { BlogContext } from "../pages/blog.page";
+import { useContext } from "react";
+import { BlogContext } from "@/pages/blog.page.jsx";
 
-import Button from "./button";
-import { CrossMallIcon } from "../Icons";
+import Button from "@/components/button/index.js";
+import { CrossMallIcon } from "@/Icons/icon.jsx";
 
-import AnimationWrapper from "../common/page-animation";
-import NoDataMessage from "./nodata.component";
+import AnimationWrapper from "@/common/page-animation.jsx";
+import NoDataMessage from "@/components/nodata.component.jsx";
 
-import CommentField from "./comment-field.component";
-import CommentCard from "./comment-card.component";
-import fetchComments from "./fetchInteraction/fetchComments";
+import CommentField from "./comment-field.component.jsx";
+import CommentCard from "./comment-card.component.jsx";
+import fetchComments from "@/utils/fetchInteraction/fetchComments.js";
 
 /*
   comment: nội dung text người dùng đang nhập.
@@ -55,7 +55,9 @@ const CommentContainer = () => {
   // }, [blog]);
 
   const loadMoreComments = async () => {
+
     let newCommentsArr = await fetchComments({
+      
       skip: totalParentCommentsLoaded,          // bỏ qua n comment đã tải
       blog_id: _id,
       setParentCommentCountFun: setTotalParentCommentsLoaded,

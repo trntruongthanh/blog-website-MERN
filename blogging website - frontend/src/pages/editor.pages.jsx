@@ -3,7 +3,7 @@ import axios from "axios";
 
 import { UserContext } from "../App";
 import { Navigate, useParams } from "react-router-dom";
-import BlogEditor from "../components/blog-editor.component";
+import BlogEditor from "../components/blog/blog-editor.component";
 import PublishForm from "../components/publish-form.component";
 import Loader from "../components/loader.component";
 

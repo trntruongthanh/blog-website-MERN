@@ -7,7 +7,7 @@ import AnimationWrapper from "../common/page-animation";
 
 import InPageNavigation from "../components/inpage-navigation.component";
 import NoDataMessage from "../components/nodata.component";
-import BlogPostCard from "../components/blog-post.component";
+import BlogPostCard from "../components/blog/blog-post.component";
 import filterPaginationData from "../common/filter-pagination-data";
 import LoadMoreDataBtn from "../components/load-more.component";
 

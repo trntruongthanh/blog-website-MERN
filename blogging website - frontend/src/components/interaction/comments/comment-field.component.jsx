@@ -3,10 +3,10 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useContext, useState } from "react";
 
-import { UserContext } from "../App";
-import { BlogContext } from "../pages/blog.page";
+import Button from "@/components/button";
 
-import Button from "./button";
+import { UserContext } from "@/App";
+import { BlogContext } from "@/pages/blog.page";
 
 /*
   User->>Frontend: Click "Post Comment"

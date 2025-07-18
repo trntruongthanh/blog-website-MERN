@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
-import { LikeIcon } from "../Icons";
-import { formatTimeAgo } from "../common/date";
+import { LikeIcon } from "@/Icons";
+import { formatTimeAgo } from "@/common/date";
 
 /*
   sm	≥ 640px	điện thoại lớn / tablet đứng

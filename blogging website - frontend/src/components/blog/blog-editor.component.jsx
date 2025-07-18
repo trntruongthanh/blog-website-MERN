@@ -4,14 +4,15 @@ import { useContext, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import EditorJS from "@editorjs/editorjs";
 
-import { uploadImage } from "../common/cloudinary";
 
-import images from "../assets/imgs/images";
-import AnimationWrapper from "../common/page-animation";
+import { uploadImage } from "@/common/cloudinary"
 
-import { EditorContext } from "../pages/editor.pages";
-import { UserContext } from "../App";
-import { tools } from "./tools.component";
+import images from "@/assets/imgs/images";
+import AnimationWrapper from "@/common/page-animation";
+
+import { EditorContext } from "@/pages/editor.pages";
+import { UserContext } from "@/App";
+import { tools } from "../tools.component";
 
 const BlogEditor = () => {
   const { setEditorState, blog, setBlog, textEditor, setTextEditor } =

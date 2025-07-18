@@ -3,11 +3,12 @@ import { useContext, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
 
-import { UserContext } from "../App";
-import { BlogContext } from "../pages/blog.page";
-import Button from "./button";
+import { UserContext } from "@/App";
+import { BlogContext } from "@/pages/blog.page";
 
-import { CommentIcon, FacebookIcon, LikedIcon, LikeIcon } from "../Icons";
+import Button from "../button";
+
+import { CommentIcon, FacebookIcon, LikedIcon, LikeIcon } from "@/Icons";
 
 /*
 | Phần         | Mục đích                                                                   |
