@@ -15,14 +15,18 @@ import {
 import Button from "./button";
 
 const SideNav = () => {
+
   const {
     userAuth: { access_token },
   } = useContext(UserContext);
 
+  // Lấy phần route sau /dashboard/ hoặc /settings/
   let page = location.pathname.split("/")[2];
 
+  // Lưu tên page để hiển thị trên tab (VD: "Blogs", "Notification", ...)
   const [pageState, setPageState] = useState(page.replace("-", " "));
 
+  // Điều khiển trạng thái sidebar trên mobile (ẩn/hiện)
   const [showSideNav, setShowSideNav] = useState(false);
 
   /*
@@ -36,6 +40,7 @@ const SideNav = () => {
 
   //==============================================================================================================================
 
+  // Underline khi mount Khi component mount, set vị trí và chiều rộng underline dưới pageStateTab
   useEffect(() => {
 
     if (pageStateTab.current && activeTabLine.current) {
@@ -47,16 +52,18 @@ const SideNav = () => {
       activeTabLine.current.style.left = offsetLeft + "px";
     }
   }, []);
-  
+
 
   useEffect(() => {
+
+    // Ẩn sidebar mobile mỗi khi chọn tab mới
     setShowSideNav(false);
 
     // Delay 1 tick để DOM render xong
     setTimeout(() => {
       if (!pageStateTab.current || !activeTabLine.current) return;
 
-      pageStateTab.current.click();
+      pageStateTab.current.click();  // Optional: trigger click để update logic khác (nếu có)
 
       let { offsetWidth, offsetLeft } = pageStateTab.current;
 
@@ -66,9 +73,18 @@ const SideNav = () => {
 
   }, [pageState]);
 
+  /*
+    .style.width = offsetWidth + "px"
+    offsetWidth: là chiều rộng thực tế (số) của phần tử được click (event.currentTarget), ví dụ là 64.
+    "px": đơn vị CSS.
+    Kết quả: gán width cho underline đúng bằng chiều rộng của tab:
+    activeTabLine.current.style.width = "64px";
+  */
   const changPageState = (event) => {
-    let { offsetWidth, offsetLeft } = event.currentTarget;
 
+    // Cập nhật underline dưới tab đang click
+    let { offsetWidth, offsetLeft } = event.currentTarget;
+    
     activeTabLine.current.style.width = offsetWidth + "px";
     activeTabLine.current.style.left = offsetLeft + "px";
 
@@ -77,7 +93,6 @@ const SideNav = () => {
     if (isClickOnBarsIcon) {
 
       setShowSideNav((prev) => !prev); // Toggle: nếu đang mở thì đóng, nếu đang đóng thì mở
-
     } else {
       setShowSideNav(false);
     }
@@ -141,6 +156,9 @@ const SideNav = () => {
     | ❌ Không                                | Tìm ông, cụ... có `position: relative/absolute/fixed/sticky` |
     | ❌ Không ai có                          | Bám vào `body` (toàn màn hình)                               |
 
+    innerText = text hiển thị
+    textContent = text có thể bao gồm cả phần ẩn
+    innerHTML = có cả HTML bên trong
   */
 
   return access_token === null ? (
@@ -192,6 +210,7 @@ const SideNav = () => {
             | `max-md:px-16`               | Padding trái/phải rộng                                              |
             | `max-md:-ml-7`               | Kéo sidebar ra ngoài một chút về bên trái (cho cảm giác tràn viền)  |
 
+            Lấy nội dung văn bản hiển thị (text) bên trong phần tử HTML mà người dùng vừa tương tác (click, hover, v.v.)
           */}
           <div
             className={
