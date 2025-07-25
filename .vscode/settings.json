@@ -1,3 +1,33 @@
+/*
+| Cấu hình                       | Mục đích chính                                  |
+| ------------------------------ | ----------------------------------------------- |
+| `terminal.integrated.suggest`  | Gợi ý lệnh trong terminal                       |
+| `tailwindCSS.includeLanguages` | Gợi ý Tailwind trong JSX, TSX, HTML             |
+| `css.validate`                 | Tránh gạch đỏ khi dùng `@apply`, `@layer`, v.v. |
+| `editor.quickSuggestions`      | Gợi ý class Tailwind trong chuỗi                |
+| `editor.formatOnSave`          | Format code tự động khi lưu                     |
+| `editor.defaultFormatter`      | Chọn Prettier làm formatter chính               |
+| `files.associations`           | Gắn file `.css` với ngôn ngữ CSS chính xác      |
+
+*/
+
 {
-    "terminal.integrated.suggest.enabled": true
+  "terminal.integrated.suggest.enabled": true,
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html",
+    "javascript": "javascript",
+    "javascriptreact": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "css.validate": false,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "editor.formatOnSave": false,
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "*.css": "css"
+  }
 }

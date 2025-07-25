@@ -19,6 +19,17 @@
 | Class có selector phức tạp (`.a .b`) | ❌ Không                             | Tailwind không xử lý tốt                        |
 | Dùng `@apply` với utility Tailwind   | ✅ Có                                | Miễn là chỉ dùng class hợp lệ                   |
 
+
+    Cách tư duy chuẩn khi code với Tailwind:
+    Bắt đầu từ mobile: viết các class cơ bản không có prefix.
+
+    Dùng breakpoint khi cần thay đổi theo kích thước màn hình:
+    sm: (~640px)
+    md: (~768px)
+    lg: (~1024px)
+    xl: (~1280px)
+    2xl: (~1536px)
+
 */
 
 
@@ -60,7 +71,11 @@
 
     .h-cover {
         @apply min-h-[calc(100vh-80px)];
-        /* .min-h-\[calc\(100vh-80px\)\] để đặt chiều cao tối thiểu (min-height) của một phần tử.*/
+        /* .min-h-\[calc\(100vh-80px\)\] để đặt chiều cao tối thiểu (min-height) của một phần tử.
+            100vh là toàn bộ chiều cao của cửa sổ trình duyệt.
+            Trừ đi 80px – thường là chiều cao của một thanh navbar cố định bên trên.
+            ➜ Như vậy, min-height = phần còn lại của màn hình (không bị navbar che). 
+        */
     }
 
     .center {
@@ -93,7 +108,7 @@
     }
 
     .box-shadow-left {
-        box-shadow:-4px 0 6px rgba(0, 0, 0, 0.1);
+        box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
     }
 
     .input-icon {
@@ -115,11 +130,11 @@
 
     /*===========================Sidebar================================*/
     .sidebar-link {
-        @apply flex gap-4 items-center py-5 text-dark-grey hover:text-black;
+        @apply flex gap-4 items-center py-5 text-dark-grey hover:text-black border-transparent;
     }
 
     .sidebar-link.active {
-        @apply text-black border-r-2 border-black pl-6 bg-grey/50 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
+        @apply text-black border-r-2 border-purple/60 pl-6 bg-purple/10 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
     }
 
     /*===========================Bài viết Blog===========================*/
@@ -168,7 +183,6 @@
     color: #6b7280;
     /*gray-500*/
 }
-
 
 
 /* Thêm vào CSS toàn cục (hoặc import vào component nếu dùng module) 

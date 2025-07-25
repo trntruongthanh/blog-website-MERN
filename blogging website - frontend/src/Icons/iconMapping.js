@@ -1,6 +1,9 @@
 import {
   UserIcon,
   FileEditIcon,
+  DocumentIcon,
+  BarsIcon,
+  BlogIcon,
   EmailIcon,
   PasswordIcon,
   HideEyeIcon,
@@ -22,6 +25,9 @@ import {
 export const ICONS = {
   user: UserIcon,
   edit: FileEditIcon,
+  doc: DocumentIcon,
+  bars: BarsIcon,
+  blog: BlogIcon,
   email: EmailIcon,
   password: PasswordIcon,
   hideEyeIcon: HideEyeIcon,

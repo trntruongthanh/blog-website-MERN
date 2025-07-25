@@ -11,6 +11,7 @@ import SearchPage from "./pages/search.page";
 import PageNotFound from "./pages/404.page";
 import ProfilePage from "./pages/profile.page";
 import BlogPage from "./pages/blog.page";
+import SideNav from "./components/sidenavbar.component";
 
 /*
   Điểm cần lưu ý
@@ -87,7 +88,13 @@ const App = () => {
         <Route path="/editor/:blog_id" element={<Editor />} />
 
         <Route path="/" element={<Navbar />}>
+
           <Route index element={<HomePage />} />
+
+          <Route path="settings" element={<SideNav />}>
+            <Route path="edit-profile" element={<h1>this is edit profile page</h1>} ></Route>
+            <Route path="change-password" element={<h1>this is change password page</h1>} ></Route>
+          </Route>
 
           <Route path="signin" element={<UserAuthForm type="sign-in" />} />
           <Route path="signup" element={<UserAuthForm type="sign-up" />} />
