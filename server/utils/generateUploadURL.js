@@ -10,7 +10,7 @@ const generateUploadURL = () => {
 
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
-    process.env.CLOUDINARY_API_SECRET_KEY
+    process.env.CLOUDINARY_API_SECRET
   );
 
   return {

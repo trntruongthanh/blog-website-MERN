@@ -137,6 +137,7 @@ import blogRoutes from "./routes/blog.routes.js";
 import interactionRoute from "./routes/interaction.route.js"
 import uploadRoutes from "./routes/upload.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import sideBarsRoutes from "./routes/sideBars.route.js"
 
 //============================================================================================
 
@@ -153,10 +154,16 @@ connectToMongoDB(process.env.MONGO_BLOG_URL, !isProduction);
 
 // Routes
 server.use(authRoutes);
+
 server.use(blogRoutes);
+
 server.use(interactionRoute)
+
 server.use(uploadRoutes);
+
 server.use(userRoutes);
+
+server.use(sideBarsRoutes)
 
 // =======================================================================================
 server.listen(PORT, () => {
