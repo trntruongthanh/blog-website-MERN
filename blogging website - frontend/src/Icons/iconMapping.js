@@ -20,6 +20,8 @@ import {
   FacebookIcon,
   LikedIcon,
   TrashIcon,
+  UsernameIcon,
+  TwitterIcon,
 } from "./icon";
 
 export const ICONS = {
@@ -29,6 +31,7 @@ export const ICONS = {
   bars: BarsIcon,
   blog: BlogIcon,
   email: EmailIcon,
+  username: UsernameIcon,
   password: PasswordIcon,
   hideEyeIcon: HideEyeIcon,
   showEyeIcon: ShowEyeIcon,
@@ -47,4 +50,5 @@ export const SOCIAL_ICONS = {
   github: GithubIcon,
   website: WebsiteIcon,
   facebook: FacebookIcon,
+  twitter: TwitterIcon,
 };

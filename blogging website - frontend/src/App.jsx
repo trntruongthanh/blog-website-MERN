@@ -14,6 +14,7 @@ import BlogPage from "./pages/blog.page";
 
 import SideNav from "./components/sidenavbar.component";
 import ChangePassword from "./pages/SideBarsPage/change-password.page";
+import EditProfile from "./pages/SideBarsPage/edit-profile.page";
 
 /*
   Điểm cần lưu ý
@@ -94,7 +95,7 @@ const App = () => {
           <Route index element={<HomePage />} />
 
           <Route path="settings" element={<SideNav />}>
-            <Route path="edit-profile" element={<h1>this is edit profile page</h1>} ></Route>
+            <Route path="edit-profile" element={<EditProfile />} ></Route>
             <Route path="change-password" element={<ChangePassword /> } ></Route>
           </Route>
 

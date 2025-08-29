@@ -1,4 +1,4 @@
-export const FileEditIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const FileEditIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Layer_1"
@@ -13,7 +13,7 @@ export const FileEditIcon = ({ width = '1.2rem', height = '1.2rem', className })
   </svg>
 );
 
-export const DocumentIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const DocumentIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Layer_1"
@@ -28,7 +28,7 @@ export const DocumentIcon = ({ width = '1.2rem', height = '1.2rem', className })
   </svg>
 );
 
-export const BarsIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const BarsIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Layer_1"
@@ -42,7 +42,7 @@ export const BarsIcon = ({ width = '1.2rem', height = '1.2rem', className }) => 
   </svg>
 );
 
-export const BlogIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const BlogIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Layer_1"
@@ -57,7 +57,7 @@ export const BlogIcon = ({ width = '1.2rem', height = '1.2rem', className }) => 
   </svg>
 );
 
-export const UserIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const UserIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     className={className}
     height={height}
@@ -72,7 +72,7 @@ export const UserIcon = ({ width = '1.2rem', height = '1.2rem', className }) => 
   </svg>
 );
 
-export const EmailIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const EmailIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -86,7 +86,22 @@ export const EmailIcon = ({ width = '1.2rem', height = '1.2rem', className }) =>
   </svg>
 );
 
-export const PasswordIcon = ({ width = '1.3rem', height = '1.3rem', className }) => (
+export const UsernameIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    id="Layer_1"
+    data-name="Layer 1"
+    viewBox="0 0 24 24"
+    className={className}
+    height={height}
+    width={width}
+    fill="currentColor"
+  >
+    <path d="M12,0A12.013,12.013,0,0,0,0,12c-.126,9.573,11.159,15.429,18.9,9.817a1,1,0,1,0-1.152-1.634C11.3,24.856,1.9,19.978,2,12,2.549-1.266,21.453-1.263,22,12v2a2,2,0,0,1-4,0V12C17.748,4.071,6.251,4.072,6,12a6.017,6.017,0,0,0,10.52,3.933A4,4,0,0,0,24,14V12A12.013,12.013,0,0,0,12,0Zm0,16a4,4,0,0,1,0-8A4,4,0,0,1,12,16Z" />
+  </svg>
+);
+
+export const PasswordIcon = ({ width = "1.3rem", height = "1.3rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -101,7 +116,7 @@ export const PasswordIcon = ({ width = '1.3rem', height = '1.3rem', className })
   </svg>
 );
 
-export const HideEyeIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const HideEyeIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -115,7 +130,7 @@ export const HideEyeIcon = ({ width = '1.2rem', height = '1.2rem', className }) 
   </svg>
 );
 
-export const ShowEyeIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const ShowEyeIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -130,7 +145,7 @@ export const ShowEyeIcon = ({ width = '1.2rem', height = '1.2rem', className }) 
   </svg>
 );
 
-export const BellIcon = ({ width = '1.2rem', height = '1.2rem', className }) => (
+export const BellIcon = ({ width = "1.2rem", height = "1.2rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -145,7 +160,7 @@ export const BellIcon = ({ width = '1.2rem', height = '1.2rem', className }) => 
   </svg>
 );
 
-export const CrossMallIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const CrossMallIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Bold"
@@ -159,7 +174,7 @@ export const CrossMallIcon = ({ width = '1.4rem', height = '1.4rem', className }
   </svg>
 );
 
-export const TrashIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const TrashIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -175,7 +190,7 @@ export const TrashIcon = ({ width = '1.4rem', height = '1.4rem', className }) =>
   </svg>
 );
 
-export const LikeIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const LikeIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -189,7 +204,7 @@ export const LikeIcon = ({ width = '1.4rem', height = '1.4rem', className }) => 
   </svg>
 );
 
-export const LikedIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const LikedIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Filled"
@@ -203,7 +218,7 @@ export const LikedIcon = ({ width = '1.4rem', height = '1.4rem', className }) =>
   </svg>
 );
 
-export const CommentIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const CommentIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -220,7 +235,7 @@ export const CommentIcon = ({ width = '1.4rem', height = '1.4rem', className }) 
   </svg>
 );
 
-export const ArrowUpIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const ArrowUpIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Layer_1"
@@ -235,7 +250,7 @@ export const ArrowUpIcon = ({ width = '1.4rem', height = '1.4rem', className }) 
   </svg>
 );
 
-export const YoutubeIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const YoutubeIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -244,7 +259,7 @@ export const YoutubeIcon = ({ width = '1.4rem', height = '1.4rem', className }) 
     x="0px"
     y="0px"
     viewBox="0 0 24 24"
-    style={{ enableBackground: 'new 0 0 24 24' }}
+    style={{ enableBackground: "new 0 0 24 24" }}
     xmlSpace="preserve"
     className={className}
     height={height}
@@ -257,7 +272,7 @@ export const YoutubeIcon = ({ width = '1.4rem', height = '1.4rem', className }) 
   </svg>
 );
 
-export const InstagramIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const InstagramIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -266,7 +281,7 @@ export const InstagramIcon = ({ width = '1.4rem', height = '1.4rem', className }
     x="0px"
     y="0px"
     viewBox="0 0 24 24"
-    style={{ enableBackground: 'new 0 0 24 24' }}
+    style={{ enableBackground: "new 0 0 24 24" }}
     xmlSpace="preserve"
     className={className}
     height={height}
@@ -281,7 +296,7 @@ export const InstagramIcon = ({ width = '1.4rem', height = '1.4rem', className }
   </svg>
 );
 
-export const GithubIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const GithubIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -290,7 +305,7 @@ export const GithubIcon = ({ width = '1.4rem', height = '1.4rem', className }) =
     x="0px"
     y="0px"
     viewBox="0 0 24 24"
-    style={{ enableBackground: 'new 0 0 24 24' }}
+    style={{ enableBackground: "new 0 0 24 24" }}
     xmlSpace="preserve"
     fill="currentColor"
     className={className}
@@ -299,7 +314,7 @@ export const GithubIcon = ({ width = '1.4rem', height = '1.4rem', className }) =
   >
     <g>
       <path
-        style={{ fillRule: 'evenodd', clipRule: 'evenodd' }}
+        style={{ fillRule: "evenodd", clipRule: "evenodd" }}
         d="M12,0.296c-6.627,0-12,5.372-12,12c0,5.302,3.438,9.8,8.206,11.387   c0.6,0.111,0.82-0.26,0.82-0.577c0-0.286-0.011-1.231-0.016-2.234c-3.338,0.726-4.043-1.416-4.043-1.416   C4.421,18.069,3.635,17.7,3.635,17.7c-1.089-0.745,0.082-0.729,0.082-0.729c1.205,0.085,1.839,1.237,1.839,1.237   c1.07,1.834,2.807,1.304,3.492,0.997C9.156,18.429,9.467,17.9,9.81,17.6c-2.665-0.303-5.467-1.332-5.467-5.93   c0-1.31,0.469-2.381,1.237-3.221C5.455,8.146,5.044,6.926,5.696,5.273c0,0,1.008-0.322,3.301,1.23   C9.954,6.237,10.98,6.104,12,6.099c1.02,0.005,2.047,0.138,3.006,0.404c2.29-1.553,3.297-1.23,3.297-1.23   c0.653,1.653,0.242,2.873,0.118,3.176c0.769,0.84,1.235,1.911,1.235,3.221c0,4.609-2.807,5.624-5.479,5.921   c0.43,0.372,0.814,1.103,0.814,2.222c0,1.606-0.014,2.898-0.014,3.293c0,0.319,0.216,0.694,0.824,0.576   c4.766-1.589,8.2-6.085,8.2-11.385C24,5.669,18.627,0.296,12,0.296z"
       />
       <path d="M4.545,17.526c-0.026,0.06-0.12,0.078-0.206,0.037c-0.087-0.039-0.136-0.121-0.108-0.18   c0.026-0.061,0.12-0.078,0.207-0.037C4.525,17.384,4.575,17.466,4.545,17.526L4.545,17.526z" />
@@ -313,7 +328,7 @@ export const GithubIcon = ({ width = '1.4rem', height = '1.4rem', className }) =
   </svg>
 );
 
-export const WebsiteIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const WebsiteIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     id="Outline"
@@ -327,7 +342,7 @@ export const WebsiteIcon = ({ width = '1.4rem', height = '1.4rem', className }) 
   </svg>
 );
 
-export const FacebookIcon = ({ width = '1.4rem', height = '1.4rem', className }) => (
+export const FacebookIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -336,7 +351,7 @@ export const FacebookIcon = ({ width = '1.4rem', height = '1.4rem', className })
     x="0px"
     y="0px"
     viewBox="0 0 24 24"
-    style={{ enableBackground: 'new 0 0 24 24' }}
+    style={{ enableBackground: "new 0 0 24 24" }}
     xmlSpace="preserve"
     fill="currentColor"
     className={className}
@@ -346,5 +361,28 @@ export const FacebookIcon = ({ width = '1.4rem', height = '1.4rem', className })
     <g>
       <path d="M24,12.073c0,5.989-4.394,10.954-10.13,11.855v-8.363h2.789l0.531-3.46H13.87V9.86c0-0.947,0.464-1.869,1.95-1.869h1.509   V5.045c0,0-1.37-0.234-2.679-0.234c-2.734,0-4.52,1.657-4.52,4.656v2.637H7.091v3.46h3.039v8.363C4.395,23.025,0,18.061,0,12.073   c0-6.627,5.373-12,12-12S24,5.445,24,12.073z" />
     </g>
+  </svg>
+);
+
+export const TwitterIcon = ({ width = "1.4rem", height = "1.4rem", className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+    version="1.1"
+    id="Capa_1"
+    x="0px"
+    y="0px"
+    viewBox="0 0 24 24"
+    style={{ enableBackground: "new 0 0 24 24" }}
+    xmlSpace="preserve"
+    fill="currentColor"
+    className={className}
+    height={height}
+    width={width}
+  >
+    <path
+      id="Logo_00000038394049246713568260000012923108920998390947_"
+      d="M21.543,7.104c0.014,0.211,0.014,0.423,0.014,0.636  c0,6.507-4.954,14.01-14.01,14.01v-0.004C4.872,21.75,2.252,20.984,0,19.539c0.389,0.047,0.78,0.07,1.172,0.071  c2.218,0.002,4.372-0.742,6.115-2.112c-2.107-0.04-3.955-1.414-4.6-3.42c0.738,0.142,1.498,0.113,2.223-0.084  c-2.298-0.464-3.95-2.483-3.95-4.827c0-0.021,0-0.042,0-0.062c0.685,0.382,1.451,0.593,2.235,0.616  C1.031,8.276,0.363,5.398,1.67,3.148c2.5,3.076,6.189,4.946,10.148,5.145c-0.397-1.71,0.146-3.502,1.424-4.705  c1.983-1.865,5.102-1.769,6.967,0.214c1.103-0.217,2.16-0.622,3.127-1.195c-0.368,1.14-1.137,2.108-2.165,2.724  C22.148,5.214,23.101,4.953,24,4.555C23.339,5.544,22.507,6.407,21.543,7.104z"
+    />
   </svg>
 );

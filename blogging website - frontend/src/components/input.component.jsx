@@ -1,10 +1,13 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-import { ICONS } from "../Icons"; // Import từ index.js
+import { ICONS, SOCIAL_ICONS } from "../Icons"; // Import từ index.js
 
-const InputBox = ({ name, type, id, value, placeholder, icon }) => {
-  const IconComponent = ICONS[icon]; // Lấy icon từ object ICONS
+const InputBox = ({ name, type, id, value, placeholder, icon, iconSocial, disable = false }) => {
+  
+  const IconComponent = ICONS[icon];            // Lấy icon từ object ICONS
+  const IconSocial = SOCIAL_ICONS[iconSocial];  // Lấy icon từ object Social
+
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -20,11 +23,14 @@ const InputBox = ({ name, type, id, value, placeholder, icon }) => {
         type={isPasswordVisible ? "text" : type}
         placeholder={placeholder}
         defaultValue={value}
+        disabled={disable}
         className="input-box"
       />
 
       {/* <i className={`fi ${icon} input-icon`}></i> */}
       {IconComponent && <IconComponent className="input-icon text-dark-grey" />}
+      {IconSocial && <IconSocial className="input-icon text-dark-grey" />}
+
 
       {type === "password" && (
         <div

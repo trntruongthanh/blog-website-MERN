@@ -132,12 +132,14 @@ import cors from "cors";
 
 import connectToMongoDB from "./config/mongoose.js";
 
-import authRoutes from "./routes/auth.routes.js";
-import blogRoutes from "./routes/blog.routes.js";
-import interactionRoute from "./routes/interaction.route.js"
-import uploadRoutes from "./routes/upload.routes.js";
-import userRoutes from "./routes/user.routes.js";
+import authRoutes from "./routes/auth.route.js";
+import blogRoutes from "./routes/blog.route.js";
+import interactionRoutes from "./routes/interaction.route.js"
+import uploadRoutes from "./routes/upload.route.js";
+import userRoutes from "./routes/user.route.js";
 import sideBarsRoutes from "./routes/sideBars.route.js"
+import profileRoutes from "./routes/profile.route.js"
+
 
 //============================================================================================
 
@@ -157,13 +159,15 @@ server.use(authRoutes);
 
 server.use(blogRoutes);
 
-server.use(interactionRoute)
+server.use(interactionRoutes)
 
 server.use(uploadRoutes);
 
 server.use(userRoutes);
 
 server.use(sideBarsRoutes)
+
+server.use(profileRoutes)
 
 // =======================================================================================
 server.listen(PORT, () => {
