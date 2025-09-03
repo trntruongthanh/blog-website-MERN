@@ -122,6 +122,18 @@ Dung findById() Tìm document theo _id.
 | Truy vấn chính xác document trong MongoDB   | `_id`       |
 | Hiển thị trên URL, SEO, người dùng đọc được | `blog_id`   |
 
+
+
+  kết hợp cả hai.
+  Lỗi dự đoán được (validation/business): dùng
+  return res.status(4xx).json({ error: "msg" })
+  → Client đọc error?.response?.data?.error || ... là đúng chuẩn.
+  Lỗi bất ngờ (system/runtime): throw err
+  → Để error-handler middleware trả 500 (hoặc map theo ý bạn).
+  
+  return … 4xx giúp bạn kiểm soát thông điệp gửi cho client (username ngắn, URL sai, không có quyền, v.v.).
+  throw cho lỗi không lường trước (DB down, code exception) và gom xử lý tại một chỗ.
+
 */
 
 import "dotenv/config";
@@ -139,6 +151,8 @@ import uploadRoutes from "./routes/upload.route.js";
 import userRoutes from "./routes/user.route.js";
 import sideBarsRoutes from "./routes/sideBars.route.js"
 import profileRoutes from "./routes/profile.route.js"
+import notificationRoutes from "./routes/notification.route.js"
+
 
 
 //============================================================================================
@@ -168,6 +182,8 @@ server.use(userRoutes);
 server.use(sideBarsRoutes)
 
 server.use(profileRoutes)
+
+server.use(notificationRoutes)
 
 // =======================================================================================
 server.listen(PORT, () => {

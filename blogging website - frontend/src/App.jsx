@@ -108,6 +108,8 @@ const App = () => {
 
           <Route path="user/:id" element={<ProfilePage />} />
 
+          <Route path="/dashboard/notification" element={<h1>Notification</h1>} />
+
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>

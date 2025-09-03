@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 import { UserContext } from "../App";
@@ -8,24 +8,57 @@ import { BellIcon, FileEditIcon } from "../Icons";
 
 import Button from "./button";
 import UserNavigationPanel from "./user-navigation.component";
+import axios from "axios";
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
 
   const [userNavPanel, setUserNavPanel] = useState(false);
 
-  let navigate = useNavigate()
-
-  //===========================================================================================
+  let navigate = useNavigate();
 
   const {
     userAuth,
+    setUserAuth,
     userAuth: { access_token, profile_img },
   } = useContext(UserContext);
 
+  const new_notification_available = userAuth?.new_notification_available;
+
+  //===========================================================================================
+
+  useEffect(() => {
+    if (!access_token) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const { data } = await axios.get(import.meta.env.VITE_SERVER_DOMAIN + "/new-notification", {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        if (cancelled) return;
+
+        setUserAuth((prev) => ({
+          ...prev,
+          new_notification_available: !!data?.new_notification_available,
+        }));
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [access_token]);
+
   // Handle Search box (min-width: 768px)
   const handleToggleSearchBoxVisibility = () => {
-    setSearchBoxVisibility(!searchBoxVisibility); // Đảo ngược trạng thái hiển thị mật khẩu
+    setSearchBoxVisibility(!searchBoxVisibility); // Đảo ngược trạng thái
   };
 
   const handleUserNavPanel = () => {
@@ -42,13 +75,12 @@ const Navbar = () => {
   //===========================================================================================
 
   const handleSearch = (event) => {
-
     let query = event.target.value;
 
     if (event.key === "Enter" && query) {
-      navigate(`/search/${query}`)
+      navigate(`/search/${query}`);
     }
-  }
+  };
 
   return (
     <>
@@ -93,19 +125,16 @@ const Navbar = () => {
               <Link to="/dashboard/notification">
                 <Button className="w-12 h-12 rounded-full flex items-center justify-center bg-grey relative hover:bg-black/10">
                   <BellIcon className="text-xl block mt-1" />
+
+                  {new_notification_available && (
+                    <span className="bg-red w-3 h-3 rounded-full absolute z-10 top-3 right-3"></span>
+                  )}
                 </Button>
               </Link>
 
-              <div
-                onClick={handleUserNavPanel}
-                onBlur={handleBlur}
-                className="relative"
-              >
+              <div onClick={handleUserNavPanel} onBlur={handleBlur} className="relative">
                 <button className="w-12 h-12 mt-1">
-                  <img
-                    src={profile_img}
-                    className="w-full h-full object-cover rounded-full"
-                  />
+                  <img src={profile_img} className="w-full h-full object-cover rounded-full" />
                 </button>
 
                 {userNavPanel && <UserNavigationPanel />}

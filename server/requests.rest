@@ -1,22 +1,22 @@
-#   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Zjc3NjUzODQ3ZmI1Y2M2MDFjMDJhMSIsImlhdCI6MTc0NDI3MDkzMX0.6eIlXI8mnm2R6QfR2ZaZqd_q4GHqNnw88N9C7iQ3a8s",
 
+# POST http://localhost:3000/signin
+# Content-Type: application/json 
 
-POST http://localhost:3000/signin
-Content-Type: application/json 
+# {
+#     "email": "trntruongthanh@gmail.com",
+#     "password": "Thanhkute0199hg"
+# }
 
-{
-    "email": "trntruongthanh@gmail.com",
-    "password": "Thanhkute0199"
-}
 
 # POST http://localhost:3000/change-password
 # Content-Type: application/json 
-# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDdhYWVmNDAxMTE1YmNkMmM3OWJhMCIsImlhdCI6MTc1NDQ0Njk0Nn0.GcJhKbEHwVsTicFHgXv49qguGhlZbr3nmDsaeNQsdJ8
+# Authorization: Bearer {access_token}
 
 # {
 #     "currentPassword": "Thanhtran123",
 #     "newPassword": "Thanhkute0199"
 # }
+
 
 
 # POST http://localhost:3000/signup
@@ -29,12 +29,14 @@ Content-Type: application/json
 # }
 
 
+
 # GET http://localhost:3000/get-upload-url 
+
 
 
 # POST http://localhost:3000/create-blog
 # Content-Type: application/json
-# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Zjc3NjUzODQ3ZmI1Y2M2MDFjMDJhMSIsImlhdCI6MTc0NDI3MDkzMX0.6eIlXI8mnm2R6QfR2ZaZqd_q4GHqNnw88N9C7iQ3a8s
+# Authorization: Bearer {access_token}
 
 # {
 #     "title": "test title @ 3 134 # 4$",
@@ -50,6 +52,7 @@ Content-Type: application/json
 # GET  http://localhost:3000/latest-blogs
 # GET  http://localhost:3000/trending-blogs
 
+
 # POST http://localhost:3000/search-blogs
 # Content-Type: application/json
 
@@ -57,8 +60,10 @@ Content-Type: application/json
 #     "tag": "hoanghon"
 # }
 
+
 # POST http://localhost:3000/all-latest-blogs-count
 # POST http://localhost:3000/search-blogs-count
+
 
 
 # POST http://localhost:3000/search-users 
@@ -68,6 +73,7 @@ Content-Type: application/json
 #     "query": "trntruongthanh"
 # }
 
+
 # POST http://localhost:3000/get-profile
 # Content-Type: application/json 
 
@@ -75,9 +81,17 @@ Content-Type: application/json
 #     "username": "trntruongthanh"
 # }
 
+
 # POST http://localhost:3000/get-blog
 # Content-Type: application/json 
 
 # {
 #     "blog_id": "bien-A9jl5"
 # }
+
+
+//========================================================================================================
+
+GET  http://localhost:3000/new-notification
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDdhYWVmNDAxMTE1YmNkMmM3OWJhMCIsImlhdCI6MTc1NjQzNjU3Nn0.x4jVAPAF-FsGnZLyItqEWccBSH-tZsmT8fQD-nmkD1U
+

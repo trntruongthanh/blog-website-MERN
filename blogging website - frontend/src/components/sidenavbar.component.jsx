@@ -15,10 +15,12 @@ import {
 import Button from "./button";
 
 const SideNav = () => {
-
   const {
+    userAuth,
     userAuth: { access_token },
   } = useContext(UserContext);
+
+  const new_notification_available = userAuth?.new_notification_available;
 
   // Lấy phần route sau /dashboard/ hoặc /settings/
   let page = location.pathname.split("/")[2];
@@ -42,20 +44,16 @@ const SideNav = () => {
 
   // Underline khi mount Khi component mount, set vị trí và chiều rộng underline dưới pageStateTab
   useEffect(() => {
-
     if (pageStateTab.current && activeTabLine.current) {
-
       const { offsetWidth, offsetLeft } = pageStateTab.current;
-      
+
       activeTabLine.current.style.width = offsetWidth + "px";
-      
+
       activeTabLine.current.style.left = offsetLeft + "px";
     }
   }, []);
 
-
   useEffect(() => {
-
     // Ẩn sidebar mobile mỗi khi chọn tab mới
     setShowSideNav(false);
 
@@ -63,14 +61,13 @@ const SideNav = () => {
     setTimeout(() => {
       if (!pageStateTab.current || !activeTabLine.current) return;
 
-      pageStateTab.current.click();  // Optional: trigger click để update logic khác (nếu có)
+      pageStateTab.current.click(); // Optional: trigger click để update logic khác (nếu có)
 
       let { offsetWidth, offsetLeft } = pageStateTab.current;
 
       activeTabLine.current.style.width = offsetWidth + "px";
       activeTabLine.current.style.left = offsetLeft + "px";
     }, 0);
-
   }, [pageState]);
 
   /*
@@ -81,17 +78,15 @@ const SideNav = () => {
     activeTabLine.current.style.width = "64px";
   */
   const changPageState = (event) => {
-
     // Cập nhật underline dưới tab đang click
     let { offsetWidth, offsetLeft } = event.currentTarget;
-    
+
     activeTabLine.current.style.width = offsetWidth + "px";
     activeTabLine.current.style.left = offsetLeft + "px";
 
     const isClickOnBarsIcon = sideBarIconTab.current.contains(event.target);
 
     if (isClickOnBarsIcon) {
-
       setShowSideNav((prev) => !prev); // Toggle: nếu đang mở thì đóng, nếu đang đóng thì mở
     } else {
       setShowSideNav(false);
@@ -239,7 +234,12 @@ const SideNav = () => {
               onClick={(event) => setPageState(event.target.innerText)}
               className="sidebar-link"
             >
-              <BellIcon />
+              <div className="relative">
+                <BellIcon />
+                {new_notification_available && (
+                  <span className="bg-red w-2 h-2 rounded-full absolute z-10 top-0 right-0"></span>
+                )}
+              </div>
               Notification
             </NavLink>
 
