@@ -85,8 +85,14 @@ export const isLiked = async (req, res) => {
 // ==========================================================================================
 
 export const addCommentInteraction = async (req, res) => {
+
+  /*
+    Khi comment mới: notification_for = blog_author → người nhận thông báo chính là tác giả blog.
+    Khi reply: lúc đầu cũng set notification_for = blog_author, nhưng sau đó ghi đè lại thành commented_by của comment gốc (tức chủ comment được reply).
+  
+  */
   const user_id = req.user;
-  const { _id, comment, blog_author, replying_to } = req.body;
+  const { _id, comment, blog_author, replying_to, notification_id } = req.body;
 
   // ⚠️ Kiểm tra dữ liệu đầu vào: nếu người dùng gửi comment rỗng (chỉ chứa khoảng trắng) thì báo lỗi
   if (!comment?.trim()) {
@@ -96,13 +102,19 @@ export const addCommentInteraction = async (req, res) => {
   }
 
   try {
+
     // 🛠️ Tạo đối tượng comment mới
+    const isReply = Boolean(replying_to); // ✅ Tính một lần để dùng lại
+    const parentId = isReply ? replying_to : undefined; // ✅ Dễ đọc, hạn chế if lặp
+    
+
     const commentObj = {
-      blog_id: _id, // ID của blog được comment
-      blog_author, // ID tác giả của blog
-      comment, // Nội dung comment
-      commented_by: user_id, // Người tạo comment
-      isReply: replying_to ? true : false,
+      blog_id: _id,                         // ID của blog được comment
+      blog_author,                          // ID tác giả của blog
+      comment,                              // Nội dung comment
+      commented_by: user_id,                // Người tạo comment
+      isReply,                              // xác định 1 lần
+      ...(isReply && { parent: parentId }), // nếu là reply thì có parent
     };
 
     /*
@@ -119,12 +131,6 @@ export const addCommentInteraction = async (req, res) => {
       | `children` | Dùng để biết comment cha có các reply nào |
 
     */
-    if (replying_to) {
-      commentObj.parent = replying_to;
-      commentObj.isReply = true;
-    } else {
-      commentObj.isReply = false; // ✅ Gán là comment cha
-    }
 
     // 💾 Lưu comment vào database (collection Comment)
     const commentFile = await new Comment(commentObj).save();
@@ -135,6 +141,7 @@ export const addCommentInteraction = async (req, res) => {
       Cập nhật collection Blog tương ứng:
       push thêm ID của comment vào mảng comments
       inc tăng số lượng comment tổng (total_comments) và comment cha (total_parent_comments) lên 1 đơn vị.
+      { new: true } = “trả về document mới sau update” thay vì document cũ.
     */
     const blog = await Blog.findOneAndUpdate(
       { _id },
@@ -142,14 +149,17 @@ export const addCommentInteraction = async (req, res) => {
         $push: { comments: commentFile._id },
         $inc: {
           "activity.total_comments": 1,
-          "activity.total_parent_comments": replying_to ? 0 : 1,
+          "activity.total_parent_comments": isReply ? 0 : 1, 
         },
-      }
+      },
+      { new: true }
     );
+
 
     if (!blog) {
       return res.status(404).json({ error: "Blog not found" });
     }
+
 
     /* Tạo notification 
       ✅ Tạo một document notification mới với loại "comment":
@@ -159,14 +169,15 @@ export const addCommentInteraction = async (req, res) => {
       comment: ID comment tạo ra
     */
     const notificationObj = new Notification({
-      type: replying_to ? "reply" : "comment",
+      type: isReply ? "reply" : "comment", 
       blog: _id,
       notification_for: blog_author,
       user: user_id,
       comment: commentFile._id,
     });
 
-    if (replying_to) {
+
+    if (isReply && notification_id) {
       /*
         Gán ID comment mà user đang reply vào trường replied_on_comment của notification.
         Mục đích: sau này khi hiển thị thông báo kiểu:
@@ -190,14 +201,37 @@ export const addCommentInteraction = async (req, res) => {
         └── Reply B1
         
       */
-      notificationObj.replied_on_comment = replying_to;
+      notificationObj.replied_on_comment = parentId;
 
       let replyingToCommentDocs = await Comment.findOneAndUpdate(
-        { _id: replying_to },
-        { $push: { children: commentFile._id } }
+        { _id: parentId },
+        { $push: { children: commentFile._id } },
+        { new: true }
       );
 
+
+      // Khuyến nghị thêm ràng buộc an toàn (tùy schema/luồng hệ thống):
+      // "notification_for": user_id,           // notification này thuộc về user hiện tại
+      // "blog": _id,                           // cùng blog
+      // "type": { $in: ["comment", "reply"] }, // chỉ các loại cho phép
+      await Notification.findOneAndUpdate(
+        {
+          _id: notification_id,
+        },
+        { $set: { reply: commentFile._id } },
+        { new: true, runValidators: true }
+      );
+
+
       // Cập nhật lại người nhận thông báo là chủ comment gốc (không phải tác giả blog)
+      if (!replyingToCommentDocs) {
+
+        // Parent không tồn tại → hoàn tác comment vừa tạo để tránh rác
+        await Comment.deleteOne({ _id: commentFile._id });
+
+        return res.status(404).json({ error: "Parent comment not found" });
+      }
+
       notificationObj.notification_for = replyingToCommentDocs.commented_by;
     }
 
@@ -213,8 +247,11 @@ export const addCommentInteraction = async (req, res) => {
       user_id,
       children,
     });
+    
   } catch (error) {
+
     console.error("Error while adding comment:", error);
+
     return res
       .status(500)
       .json({ error: "Internal Server Error", error: error.message });
@@ -286,24 +323,25 @@ export const getReplies = async (req, res) => {
   try {
     let doc = await Comment.findOne({ _id })
       .populate({
-        path: "children",             // 1️⃣ Populate mảng replies (ObjectId)
+        path: "children", // 1️⃣ Populate mảng replies (ObjectId)
         options: {
-          limit: maxLimit,            // 2️⃣ Lấy tối đa N replies
-          skip: skip,                 // 3️⃣ Bỏ qua skip replies đầu tiên
-          sort: { commentedAt: -1 },  // 4️⃣ Sắp xếp mới nhất trước
+          limit: maxLimit, // 2️⃣ Lấy tối đa N replies
+          skip: skip, // 3️⃣ Bỏ qua skip replies đầu tiên
+          sort: { commentedAt: -1 }, // 4️⃣ Sắp xếp mới nhất trước
         },
         populate: {
-          path: "commented_by",       // 5️⃣ Populate lồng: lấy thông tin user của từng reply
+          path: "commented_by", // 5️⃣ Populate lồng: lấy thông tin user của từng reply
           select:
             "personal_info.profile_img personal_info.fullname personal_info.username",
         },
-        select: "-blog_id -updatedAt",  // 6️⃣ Bỏ các trường không cần thiết trong replies
+        select: "-blog_id -updatedAt", // 6️⃣ Bỏ các trường không cần thiết trong replies
       })
-      .select("children");              // 7️⃣ Chỉ lấy trường children từ comment cha
+      .select("children"); // 7️⃣ Chỉ lấy trường children từ comment cha
 
     return res.status(200).json({ replies: doc.children });
-    
+
   } catch (error) {
+
     console.log(error.message);
     return res.status(500).json({ error: error.message });
   }
@@ -333,7 +371,14 @@ export const deleteComment = async (req, res) => {
   try {
     let comment = await Comment.findOne({ _id });
 
-    if (user_id.toString() === comment.commented_by.toString() || user_id.toString() === comment.blog_author.toString()) {
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    if (
+      user_id.toString() === comment.commented_by.toString() ||
+      user_id.toString() === comment.blog_author.toString()
+    ) {
       await deleteComments(_id);
 
       return res.status(200).json({ status: "done" });
@@ -341,7 +386,6 @@ export const deleteComment = async (req, res) => {
       return res.status(403).json({ error: "You can not delete this comment" });
     }
   } catch (error) {
-
     console.log(error.message);
     return res.status(500).json({ error: error.message });
   }

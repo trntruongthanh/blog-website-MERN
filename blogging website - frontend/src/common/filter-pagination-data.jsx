@@ -40,9 +40,20 @@ const filterPaginationData = async ({
   page,
   countRoute,
   data_to_send = {},
+  userAccessToken = undefined,
 }) => {
+
   try {
+    
     let obj;
+
+    const headers = {};
+
+    if (userAccessToken) {
+      headers.headers = {
+        Authorization: `Bearer ${userAccessToken}`,
+      };
+    }
 
     /* Merge dữ liệu nếu đang phân trang (state != null và create_new_arr === false) 
       
@@ -55,26 +66,26 @@ const filterPaginationData = async ({
       !create_new_arr: không tạo mảng mới → ta đang tải thêm trang, không phải load lần đầu hay đổi category.
     */
     if (state != null && !create_new_arr) {
-
+      
       obj = {
         ...state,
-        results: [...state.results, ...data],  // Gộp mảng cũ (state.results) với mảng blog mới (data). Giữ lại blog cũ, nối thêm blog mới vào cuối.
+        results: [...state.results, ...data], // Gộp mảng cũ (state.results) với mảng blog mới (data). Giữ lại blog cũ, nối thêm blog mới vào cuối.
         page: page,                            // Cập nhật page hiện tại bằng số trang mới được fetch (thường là state.page + 1).
       };
 
     } else {
-      
-      let { data: { totalDocs }} = await axios.post(
-        import.meta.env.VITE_SERVER_DOMAIN + countRoute,
-        data_to_send
-      );
+
+      let {
+        data: { totalDocs },
+      } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + countRoute, data_to_send, headers);
 
       obj = { results: data, page: 1, totalDocs };
     }
 
     return obj;
-    
+
   } catch (error) {
+
     console.error("Error in filterPaginationData:", error);
     return null;
   }

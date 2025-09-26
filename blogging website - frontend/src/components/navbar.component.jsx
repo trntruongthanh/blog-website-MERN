@@ -45,25 +45,31 @@ const Navbar = () => {
         setUserAuth((prev) => ({
           ...prev,
           new_notification_available: !!data?.new_notification_available,
+
         }));
       } catch (error) {
         console.log(error);
       }
+
     })();
 
     return () => {
       cancelled = true;
     };
+    
   }, [access_token]);
+
 
   // Handle Search box (min-width: 768px)
   const handleToggleSearchBoxVisibility = () => {
     setSearchBoxVisibility(!searchBoxVisibility); // Đảo ngược trạng thái
   };
 
+
   const handleUserNavPanel = () => {
     setUserNavPanel((current) => !current);
   };
+
 
   // setTimeout giúp đảm bảo người dùng có thể click vào mục trong menu trước khi nó bị ẩn đi.
   const handleBlur = () => {
@@ -81,6 +87,7 @@ const Navbar = () => {
       navigate(`/search/${query}`);
     }
   };
+
 
   return (
     <>
@@ -122,7 +129,7 @@ const Navbar = () => {
 
           {access_token ? (
             <>
-              <Link to="/dashboard/notification">
+              <Link to="/dashboard/notifications">
                 <Button className="w-12 h-12 rounded-full flex items-center justify-center bg-grey relative hover:bg-black/10">
                   <BellIcon className="text-xl block mt-1" />
 

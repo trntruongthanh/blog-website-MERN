@@ -15,6 +15,7 @@ import {
 import Button from "./button";
 
 const SideNav = () => {
+  
   const {
     userAuth,
     userAuth: { access_token },
@@ -161,6 +162,7 @@ const SideNav = () => {
   ) : (
     <>
       <section className="relative flex gap-10 py-0 m-0 max-md:flex-col">
+
         {/* Sidebar bên trái */}
         <div className="sticky top-[80px] z-30">
           <div className="md:hidden bg-white py-1 border-b border-grey flex flex-nowrap overflow-x-auto">
@@ -230,7 +232,7 @@ const SideNav = () => {
             </NavLink>
 
             <NavLink
-              to="/dashboard/notification"
+              to="/dashboard/notifications"
               onClick={(event) => setPageState(event.target.innerText)}
               className="sidebar-link"
             >
@@ -281,7 +283,9 @@ const SideNav = () => {
         <div className="flex-1">
           <Outlet />
         </div>
+        
       </section>
+
     </>
   );
 };

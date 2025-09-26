@@ -44,43 +44,8 @@
 📝 Tạo / sửa / xóa dữ liệu	✅ Có
 🔍 Chỉ xem, không cá nhân hóa	❌ Không
 
-======================================================================================
 
-Dùng find() Tìm nhiều document khớp với điều kiện query.
-Dùng findOne() Tìm 1 document đầu tiên khớp với điều kiện.
-Dung findById() Tìm document theo _id.
-
-| Toán tử   | Ý nghĩa                                         |
-| --------- | ----------------------------------------------- |
-| `$eq`     | Bằng (`=`)                                      |
-| `$ne`     | Khác (`!=`)                                     |
-| `$gt`     | Lớn hơn                                         |
-| `$gte`    | Lớn hơn hoặc bằng                               |
-| `$lt`     | Nhỏ hơn                                         |
-| `$lte`    | Nhỏ hơn hoặc bằng                               |
-| `$in`     | Giá trị nằm trong mảng                          |
-| `$nin`    | Giá trị **không** nằm trong mảng                |
-| `$regex`  | So khớp chuỗi bằng biểu thức chính quy (regex)  |
-| `$exists` | Kiểm tra trường có tồn tại không                |
-| `$type`   | Kiểm tra kiểu dữ liệu (`string`, `number`, ...) |
-| `$and`    | Nhiều điều kiện `và`                            |
-| `$or`     | Một trong nhiều điều kiện                       |
-| `$nor`    | **Không** thuộc bất kỳ điều kiện nào            |
-| `$not`    | Phủ định một điều kiện                          |
-| `$pull`   | Loại bỏ một (hoặc nhiều) phần tử khỏi mảng mà khớp với giá trị hoặc điều kiện cụ thể.                        |
-
-
-| Phương thức     | Công dụng                                                            |
-| --------------- | -------------------------------------------------------------------- |
-| `.limit(n)`     | Giới hạn số document trả về                                          |
-| `.skip(n)`      | Bỏ qua `n` document đầu tiên                                         |
-| `.sort(obj)`    | Sắp xếp kết quả (`1` tăng dần, `-1` giảm dần)                        |
-| `.project(obj)` | Chọn field nào được trả về (thay cho `projection` trong `find`)      |
-| `.count()`      | Đếm số document khớp (khuyên dùng `countDocuments()` trong Mongoose) |
-| `.populate()`   | (chỉ có trong Mongoose) → lấy dữ liệu từ bảng khác theo `ObjectId`   |
-
-
-============================================================================================
+==================================================================================================================================
 /*
   Trong Express.js, req.body chứa dữ liệu từ request mà client gửi lên server, thường là dữ liệu JSON từ body của HTTP request.
   📌 Mã hóa mật khẩu bằng bcrypt
@@ -122,8 +87,6 @@ Dung findById() Tìm document theo _id.
 | Truy vấn chính xác document trong MongoDB   | `_id`       |
 | Hiển thị trên URL, SEO, người dùng đọc được | `blog_id`   |
 
-
-
   kết hợp cả hai.
   Lỗi dự đoán được (validation/business): dùng
   return res.status(4xx).json({ error: "msg" })
@@ -152,7 +115,6 @@ import userRoutes from "./routes/user.route.js";
 import sideBarsRoutes from "./routes/sideBars.route.js"
 import profileRoutes from "./routes/profile.route.js"
 import notificationRoutes from "./routes/notification.route.js"
-
 
 
 //============================================================================================

@@ -4,7 +4,7 @@ import Notification from "../../Schema/Notification.js";
 
 const deleteComments = async (_id) => {
   try {
-
+    
     /*
         1. Tìm comment cần xóa trong DB.
         → comment là document bình luận được lấy ra.
@@ -37,8 +37,10 @@ const deleteComments = async (_id) => {
 
     const comment = await Comment.findOne({ _id });
 
+   
     if (!comment) return;
 
+   
     // Gỡ khỏi comment cha nếu có
     if (comment.parent) {
       await Comment.findOneAndUpdate(
@@ -47,7 +49,7 @@ const deleteComments = async (_id) => {
       );
     }
 
-    /* Xoá toàn bộ notification liên quan 
+    /* Xoá toàn bộ notification liên quan  
     | Thành phần                     | Giải thích                                                                             |
     | ------------------------------ | -------------------------------------------------------------------------------------- |
     | `Notification.deleteMany(...)` | Xoá tất cả các document trong collection `Notification` mà **thoả điều kiện**          |
@@ -55,15 +57,25 @@ const deleteComments = async (_id) => {
     | `{ comment: _id }`             | Tìm thông báo có trường `comment` bằng `_id` này (tức là liên quan đến comment bị xoá) |
     | `{ reply: _id }`               | Hoặc thông báo có trường `reply` bằng `_id` này (tức là liên quan đến reply bị xoá)    |
     */
-    await Notification.deleteMany({
-      $or: [{ comment: _id }, { reply: _id }],
-    });
+    // Nếu logic là xoá hẳn mọi thông báo dính đến comment này (dù nó là parent hay reply):
+    // await Notification.deleteMany({
+    //   $or: [{ comment: _id }, { reply: _id }],
+    // });
 
 
+    // Nếu bạn muốn giữ lại thông báo gốc, chỉ cần gỡ phần reply khỏi nó:
+    // MongoDB có toán tử $unset → dùng để xóa một field ra khỏi document.
+    await Notification.updateMany({ reply: _id }, { $unset: { reply: 1 } });
+
+
+    // Nếu là comment cha thì xoá hẳn notif liên quan đến nó
+    await Notification.deleteMany({ comment: _id });
+    
+    
     /*
-        Gỡ khỏi blog + cập nhật counters
-        Dòng thứ nhất luôn giảm tổng số comment (total_comments).
-        Dòng thứ hai chỉ giảm số comment cha (total_parent_comments) nếu comment đang xoá là comment cha.
+      Gỡ khỏi blog + cập nhật counters
+      Dòng thứ nhất luôn giảm tổng số comment (total_comments).
+      Dòng thứ hai chỉ giảm số comment cha (total_parent_comments) nếu comment đang xoá là comment cha.
     */
     await Blog.findOneAndUpdate(
       { _id: comment.blog_id },
@@ -72,18 +84,28 @@ const deleteComments = async (_id) => {
         $inc: {
           "activity.total_comments": -1,
           "activity.total_parent_comments": comment.parent ? 0 : -1,
-        }
         },
+      }
     );
 
-    // Xoá đệ quy các reply con
-    for (const replyId of comment.children) {
-      await deleteComments(replyId);
+    // 5) Xoá đệ quy các reply con (song song hoặc tuần tự)
+    if (Array.isArray(comment.children) && comment.children.length) {
+
+      // tuần tự (an toàn)
+      for (const replyId of comment.children) {
+
+        await deleteComments(replyId); // sẽ tự mở transaction mới;
+        // nếu muốn gom chung 1 transaction lớn, refactor thành 1 hàm private nhận session
+      }
+
+      // HOẶC song song (nhanh hơn, cân nhắc tải/lock):
+      // await Promise.all(comment.children.map(id => deleteComments(id)));
     }
 
     // Xoá chính comment
     await Comment.findByIdAndDelete(_id);
-
+  
+  
   } catch (error) {
     console.log(error.message);
   }

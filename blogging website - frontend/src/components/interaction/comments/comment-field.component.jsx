@@ -61,6 +61,10 @@ const CommentField = ({
 
   const [comment, setComment] = useState("");
 
+  /*
+    .trim() bỏ hết khoảng trắng đầu/cuối (bao gồm xuống dòng, tab).
+    Nếu sau khi trim còn rỗng ⇒ không có nội dung hợp lệ.
+  */  
   const hasComment = comment.trim() !== ""; // xử lý nút comment khi có nội dung
 
   //========================================================================================

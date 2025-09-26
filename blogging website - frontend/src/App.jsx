@@ -15,6 +15,7 @@ import BlogPage from "./pages/blog.page";
 import SideNav from "./components/sidenavbar.component";
 import ChangePassword from "./pages/SideBarsPage/change-password.page";
 import EditProfile from "./pages/SideBarsPage/edit-profile.page";
+import Notifications from "./pages/notifications.page";
 
 /*
   Điểm cần lưu ý
@@ -42,9 +43,7 @@ const App = () => {
   useEffect(() => {
     let userInSession = lookInSession("user");
 
-    userInSession
-      ? setUserAuth(JSON.parse(userInSession))
-      : setUserAuth({ access_token: null });
+    userInSession ? setUserAuth(JSON.parse(userInSession)) : setUserAuth({ access_token: null });
   }, []);
 
   const value = {
@@ -91,12 +90,15 @@ const App = () => {
         <Route path="/editor/:blog_id" element={<Editor />} />
 
         <Route path="/" element={<Navbar />}>
-
           <Route index element={<HomePage />} />
 
+          <Route path="dashboard" element={<SideNav />}>
+            <Route path="notifications" element={<Notifications />} />
+          </Route>
+
           <Route path="settings" element={<SideNav />}>
-            <Route path="edit-profile" element={<EditProfile />} ></Route>
-            <Route path="change-password" element={<ChangePassword /> } ></Route>
+            <Route path="edit-profile" element={<EditProfile />} />
+            <Route path="change-password" element={<ChangePassword />} />
           </Route>
 
           <Route path="signin" element={<UserAuthForm type="sign-in" />} />
