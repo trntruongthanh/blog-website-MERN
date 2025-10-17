@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import { UserContext } from "@/App";
-import { profileDataStructure } from "../profile.page";
+import { profileDataStructure } from "../../profile.page";
 
 import AnimationWrapper from "@/common/page-animation";
 import Loader from "@/components/loader.component";

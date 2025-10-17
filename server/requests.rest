@@ -92,6 +92,17 @@
 
 //========================================================================================================
 
-GET  http://localhost:3000/new-notification
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDdhYWVmNDAxMTE1YmNkMmM3OWJhMCIsImlhdCI6MTc1NjQzNjU3Nn0.x4jVAPAF-FsGnZLyItqEWccBSH-tZsmT8fQD-nmkD1U
+# GET  http://localhost:3000/new-notification
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDdhYWVmNDAxMTE1YmNkMmM3OWJhMCIsImlhdCI6MTc1NjQzNjU3Nn0.x4jVAPAF-FsGnZLyItqEWccBSH-tZsmT8fQD-nmkD1U
 
+
+//========================================================================================================
+
+# POST http://localhost:3000/user-written-blogs
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDdhYWVmNDAxMTE1YmNkMmM3OWJhMCIsImlhdCI6MTc1ODg1NTgwN30.3lnFtQhT5BjKsv9WFNGb3SYlfz4jhrRnOTjvtuylEk4
+# Content-Type: application/json 
+
+# {
+#     "page": 1,
+#     "draft": true
+# }

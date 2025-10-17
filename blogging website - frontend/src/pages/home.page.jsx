@@ -21,6 +21,8 @@ const HomePage = () => {
 
   const [pageState, setPageState] = useState("home");  // quản lý tags
 
+  const NAV_ROUTES = [pageState, "trending blogs"];
+
   const categories = [
     "programming",
     "hollywood",
@@ -163,7 +165,7 @@ const HomePage = () => {
       <section className="h-cover flex justify-center gap-10">
         <div className="w-full">
           <InPageNavigation
-            routes={[pageState, "trending blogs"]}
+            routes={NAV_ROUTES}
             defaultHidden={["trending blogs"]}
           >
             {/* latest blogs */}

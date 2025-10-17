@@ -15,8 +15,7 @@ import { UserContext } from "@/App";
 import { tools } from "../tools.component";
 
 const BlogEditor = () => {
-  const { setEditorState, blog, setBlog, textEditor, setTextEditor } =
-    useContext(EditorContext);
+  const { setEditorState, blog, setBlog, textEditor, setTextEditor } = useContext(EditorContext);
 
   const { title, banner, content, tags, des } = blog;
 
@@ -206,7 +205,7 @@ const BlogEditor = () => {
       toast.success("Saved 👌");
 
       setTimeout(() => {
-        navigate("/");
+        navigate("/dashboard/blogs?tab=draft");
       }, 500);
       
     } catch (error) {

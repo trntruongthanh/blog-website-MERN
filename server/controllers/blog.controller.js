@@ -1,5 +1,7 @@
 import User from "../Schema/User.js";
 import Blog from "../Schema/Blog.js";
+import Notification from "../Schema/Notification.js";
+import Comment from "../Schema/Comment.js";
 
 import slugify from "../utils/slugify.js"; // Sử dụng slugify để tạo blog_id từ title
 
@@ -145,6 +147,12 @@ export const searchBlogsCount = async (req, res) => {
     const { tag, query, author } = req.body;
     let findQuery;
 
+    /*
+      new RegExp(query, "i") tạo ra một biểu thức chính quy (regular expression) trong JavaScript.
+      query là chuỗi mà bạn muốn tìm.
+      "i" là flag (cờ) cho biết tìm không phân biệt chữ hoa chữ thường (case-insensitive).
+    */
+
     if (tag) {
       findQuery = { tags: tag, draft: false };
     } else if (query) {
@@ -216,21 +224,19 @@ export const createBlog = async (req, res) => {
   let blog_id = id || slugify(title);
 
   if (id) {
-
     try {
       await Blog.findOneAndUpdate(
         { blog_id },
         { title, des, banner, content, draft: draft ? draft : false }
       );
 
-      return res.status(200).json({ id: blog_id })
-
+      return res.status(200).json({ id: blog_id });
     } catch (error) {
-      return res.status(500).json({ error: "Fail to update total posts number" });
+      return res
+        .status(500)
+        .json({ error: "Fail to update total posts number" });
     }
-
   } else {
-
     let blog = new Blog({
       title,
       banner,
@@ -250,7 +256,7 @@ export const createBlog = async (req, res) => {
       const incrementValue = draft ? 0 : 1;
 
       try {
-      /*
+        /*
         { _id: authorId }
         Đây là điều kiện truy vấn (filter) – MongoDB sẽ tìm một document trong collection User có _id bằng authorId.
         
@@ -283,7 +289,6 @@ export const createBlog = async (req, res) => {
       }
 
       return res.status(200).json({ id: savedBlog.blog_id });
-
     } catch (err) {
       return res.status(500).json({ error: "Failed to create blog" });
     }
@@ -334,7 +339,9 @@ export const getBlog = async (req, res) => {
         "author",
         "personal_info.fullname personal_info.username personal_info.profile_img"
       )
-      .select("title des content banner activity publishedAt blog_id tags draft");
+      .select(
+        "title des content banner activity publishedAt blog_id tags draft"
+      );
 
     try {
       await User.findOneAndUpdate(
@@ -360,6 +367,85 @@ export const getBlog = async (req, res) => {
     }
 
     return res.status(200).json({ blog });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//========================== API Dashboard sidebar blogs =================================================================
+
+// This endpoint returns a paginated list of blogs written by the logged-in user.
+export const userWrittenBlogs = async (req, res) => {
+  const user_id = req.user;
+
+  const { page, draft, query, deleteDocCount } = req.body;
+
+  const maxLimit = 5;
+
+  let skipDocs = Math.max(0, (page - 1) * maxLimit - (deleteDocCount || 0));
+
+  let findQuery = {
+    author: user_id,
+    draft: draft === true ? true : false,
+    ...(query ? { title: new RegExp(query, "i") } : {}), // chỉ thêm khi có query
+  };
+
+  try {
+    let blogs = await Blog.find(findQuery)
+      .skip(skipDocs)
+      .limit(maxLimit)
+      .sort({ publishedAt: -1 })
+      .select("title banner blog_id activity des draft publishedAt -_id"); // chỉ lấy những field này loại bỏ _id
+
+    return res.status(200).json({ blogs });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//===========================================================================================
+
+// This endpoint returns the total number of blogs (published or draft) for pagination purposes.
+export const userWrittenBlogsCount = async (req, res) => {
+  const user_id = req.user;
+
+  const { draft, query } = req.body;
+
+  try {
+    let findQuery = {
+      author: user_id,
+      draft: draft === true ? true : false,
+      ...(query ? { title: new RegExp(query, "i") } : {}), // chỉ thêm khi có query
+    };
+
+    const count = await Blog.countDocuments(findQuery);
+
+    return res.status(200).json({ totalDocs: count });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//===========================================================================================
+
+export const deleteBlog = async (req, res) => {
+  const user_id = req.user;
+  const { blog_id } = req.body;
+
+  try {
+    const blog = await Blog.findOneAndDelete({ blog_id });
+
+    await Notification.deleteMany({ blog: blog._id });
+
+    await Comment.deleteMany({ blog_id: blog._id });
+
+    await User.findOneAndUpdate(
+      { _id: user_id },
+      { $pull: { blogs: blog._id }, $inc: { "account_info.total_posts": -1 } }
+    );
+
+    return res.status(200).json({ message: "Blog deleted successfully" });
+
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

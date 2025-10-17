@@ -13,9 +13,10 @@ import ProfilePage from "./pages/profile.page";
 import BlogPage from "./pages/blog.page";
 
 import SideNav from "./components/sidenavbar.component";
-import ChangePassword from "./pages/SideBarsPage/change-password.page";
-import EditProfile from "./pages/SideBarsPage/edit-profile.page";
-import Notifications from "./pages/notifications.page";
+import ChangePassword from "./pages/SideBarPage/SettingsSidebar/change-password.page";
+import EditProfile from "./pages/SideBarPage/SettingsSidebar/edit-profile.page";
+import Notifications from "./pages/SideBarPage/Dashboard/notifications.page";
+import ManageBlogsSidebar from "./pages/SideBarPage/Dashboard/manage-blogs.page";
 
 /*
   Điểm cần lưu ý
@@ -93,6 +94,7 @@ const App = () => {
           <Route index element={<HomePage />} />
 
           <Route path="dashboard" element={<SideNav />}>
+            <Route path="blogs" element={<ManageBlogsSidebar />} />
             <Route path="notifications" element={<Notifications />} />
           </Route>
 

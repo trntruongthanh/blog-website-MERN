@@ -2,25 +2,42 @@ import { useEffect, useRef, useState } from "react";
 import Button from "./button";
 
 /*
-  ref trong React dùng để truy cập trực tiếp đến một DOM element hoặc một React component.
-  Nhưng khi bạn dùng ref cho một component do bạn tạo (<Button />) thì sao?
-  <Button ref={btnRef}>Click</Button>
-
-👉Lúc này, mặc định React không biết ref đó muốn trỏ tới cái gì trong Button.jsx, vì nó là một component.
-  Nếu bạn không làm gì, btnRef.current sẽ là undefined.
+  routes: danh sách tên tab (mảng string).
+  defaultHidden: những route sẽ ẩn ở md (Tailwind md:hidden)—phù hợp ẩn “trending” khỏi nav khi desktop.
+  defaultActiveIndex: tab mặc định (thường 0).
+  autoSnapOnDesktop: bật/tắt tính năng “resize về tab mặc định”.
+  snapBreakpoint: ngưỡng pixel để coi là “desktop” (mặc định 768).
+  children: nội dung các tab. Nếu có nhiều tab, React sẽ gom children thành mảng cùng thứ tự với routes.   
 */
 
 const InPageNavigation = ({
   routes,
   defaultHidden = [],
   defaultActiveIndex = 0,
+  autoSnapOnDesktop = true,
+  snapBreakpoint = 768,
   children,
 }) => {
+
+  /*
+      Khi rộng màn hình ≥ 768px (md breakpoint), tab "trending blogs" sẽ hiển thị ở sidebar.
+    => Nếu người dùng đang ở tab "trending blogs" trong InPageNavigation (mobile),
+    ta tự động đưa họ quay về tab mặc định (homepage) để tránh trạng thái "mất tab".
+
+    activeTabLineRef: trỏ tới <hr> làm underline chạy dưới tab active.
+    activeTabRef: trỏ tới nút của tab mặc định (để có thể “snap” về nó khi resize).
+    inPageNavIndex: index tab hiện hành (UI và panel nội dung dựa vào state này).
+  */
+
   let activeTabLineRef = useRef();
   let activeTabRef = useRef();
 
   const [inPageNavIndex, setInPageNavIndex] = useState(defaultActiveIndex);
 
+
+  //==============================================================================================
+
+  // Hàm chuyển tab (và di chuyển underline)
   const changPageState = (btn, index) => {
     /*
       offsetWidth	Chiều rộng của phần tử btn tính bằng pixel (bao gồm padding + border).
@@ -28,8 +45,6 @@ const InPageNavigation = ({
 
       Dòng 1: Căn chỉnh chiều rộng underline bằng đúng chiều rộng của nút tab.
       Dòng 2: Di chuyển underline tới đúng vị trí nút tab đang được chọn.
-
-
     */
     let { offsetWidth, offsetLeft } = btn;
 
@@ -39,14 +54,43 @@ const InPageNavigation = ({
     setInPageNavIndex(index);
   };
 
-  useEffect(() => {
-    if (activeTabRef.current) {
-      changPageState(activeTabRef.current, inPageNavIndex);
-    }
-  }, [routes]);
-  
-  //========================================================================================
 
+  //============================================================================================
+
+  // Nếu đang ở tab trending (index !== default) và resize lên desktop (≥768),
+  // Effect “auto snap về tab mặc định” khi resize
+  useEffect(() => {
+
+    // nếu autoSnapOnDesktop === false → không làm gì (không gắn listener).
+    if (!autoSnapOnDesktop) return;
+
+    const handleResize = () => {
+      const w = window.innerWidth;
+
+      // Nếu >= snapBreakpoint và đang ở tab khác tab mặc định
+      if (w >= snapBreakpoint && inPageNavIndex !== defaultActiveIndex) {
+
+        // Gọi chung hàm để set underline + index
+        if (activeTabRef.current) {
+          changPageState(activeTabRef.current, defaultActiveIndex);
+
+        } else {
+          // Fallback (hiếm khi xảy ra)
+          setInPageNavIndex(defaultActiveIndex);
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+
+  }, [inPageNavIndex, defaultActiveIndex]);
+
+
+  //================================================================================================
+
+  
   /*
     React ngầm hiểu rằng bạn đang truyền nhiều phần tử con (children) vào InPageNavigation. Và khi có nhiều phần tử cùng cấp, React sẽ tự gom chúng thành một mảng.
     {Array.isArray(children) ? children[inPageNavIndex] : children}
