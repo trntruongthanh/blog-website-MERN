@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { UserContext } from "../App";
+import { useTheme } from "@/hooks/useTheme";
 
 import AnimationWrapper from "../common/page-animation";
 import Loader from "../components/loader.component";
@@ -47,6 +48,8 @@ const ProfilePage = () => {
   const {
     userAuth: { username },
   } = useContext(UserContext);
+
+  const { theme, setTheme } = useTheme();
 
   //========================================================================================
 
@@ -210,7 +213,7 @@ const ProfilePage = () => {
               {profileId === username ? (
                 <Link
                   to="/settings/edit-profile"
-                  className="btn-light rounded-md hover:bg-lavender"
+                  className={"btn-light rounded-md hover:bg-lavender " + (theme === "dark" ? "hover:bg-slate-700" : "")}
                 >
                   Edit Profile
                 </Link>

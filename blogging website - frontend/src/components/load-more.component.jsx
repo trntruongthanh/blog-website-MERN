@@ -1,3 +1,4 @@
+import { useTheme } from "@/hooks/useTheme";
 import Button from "./button";
 
 /**
@@ -11,12 +12,16 @@ import Button from "./button";
  */
 
 const LoadMoreDataBtn = ({ state, fetchDataFunc, additionalParam }) => {
-  
+  const { theme, setTheme } = useTheme();
+
   if (state != null && state.totalDocs > state.results.length) {
     return (
       <Button
         onClick={() => fetchDataFunc({ page: state.page + 1, ...additionalParam })}
-        className="flex items-center gap-2 rounded-md p-2 px-3 text-dark-grey "
+        className={
+          "flex items-center gap-2 rounded-md p-2 px-3 text-dark-grey " +
+          (theme === "dark" ? "hover:bg-slate-600" : " ")
+        }
       >
         Load More
       </Button>

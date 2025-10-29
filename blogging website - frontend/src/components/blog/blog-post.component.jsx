@@ -42,7 +42,7 @@ const BlogPostCard = ({ data }) => {
     >
       <div className="w-full">
         <div className="flex gap-2 items-center mb-4">
-          <img src={profile_img} className="w-6 h-6 rounded-full" />
+          <img src={profile_img} className="w-6 h-6 rounded-full overflow-hidden shrink-0" />
           <p className="line-clamp-1">
             {fullname} @{username}
           </p>

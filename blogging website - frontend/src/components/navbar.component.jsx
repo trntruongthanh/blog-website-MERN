@@ -1,10 +1,12 @@
+import clsx from "clsx";
 import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 import { UserContext } from "../App";
+import { useTheme } from "@/hooks/useTheme";
 
 import images from "../assets/imgs/images";
-import { BellIcon, FileEditIcon } from "../Icons";
+import { BellIcon, FileEditIcon, MoonIconBold, MoonIconRegular } from "../Icons";
 
 import Button from "./button";
 import UserNavigationPanel from "./user-navigation.component";
@@ -22,6 +24,8 @@ const Navbar = () => {
     setUserAuth,
     userAuth: { access_token, profile_img },
   } = useContext(UserContext);
+
+  const { theme, setTheme } = useTheme();
 
   const new_notification_available = userAuth?.new_notification_available;
 
@@ -45,31 +49,25 @@ const Navbar = () => {
         setUserAuth((prev) => ({
           ...prev,
           new_notification_available: !!data?.new_notification_available,
-
         }));
       } catch (error) {
         console.log(error);
       }
-
     })();
 
     return () => {
       cancelled = true;
     };
-    
   }, [access_token]);
-
 
   // Handle Search box (min-width: 768px)
   const handleToggleSearchBoxVisibility = () => {
     setSearchBoxVisibility(!searchBoxVisibility); // Đảo ngược trạng thái
   };
 
-
   const handleUserNavPanel = () => {
     setUserNavPanel((current) => !current);
   };
-
 
   // setTimeout giúp đảm bảo người dùng có thể click vào mục trong menu trước khi nó bị ẩn đi.
   const handleBlur = () => {
@@ -78,7 +76,7 @@ const Navbar = () => {
     }, 200);
   };
 
-  //===========================================================================================
+  //=========================================================================================================
 
   const handleSearch = (event) => {
     let query = event.target.value;
@@ -88,13 +86,22 @@ const Navbar = () => {
     }
   };
 
+  //=========================================================================================================
+
+  const handleChangeTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+
+    setTheme(newTheme);
+  };
+
+  //=========================================================================================================
 
   return (
     <>
       <nav className="navbar z-50">
         {/*LOGO*/}
         <Link to="/" className="flex-none w-10">
-          <img src={images.logo} className="w-full" />
+          <img src={theme === "light" ? images.logo : images.logoWhite} className="w-full" />
         </Link>
 
         {/*INPUT */}
@@ -127,10 +134,37 @@ const Navbar = () => {
             <p>Write</p>
           </Link>
 
+          {theme === "light" ? (
+            <Button
+              onClick={handleChangeTheme}
+              className={clsx(
+                "w-12 h-12 rounded-full flex items-center justify-center bg-grey relative",
+                theme === "dark" && "hover:bg-slate-600"
+              )}
+            >
+              <MoonIconRegular className="text-dark-grey text-xl" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleChangeTheme}
+              className={clsx(
+                "w-12 h-12 rounded-full flex items-center justify-center bg-grey relative",
+                theme === "dark" && "hover:bg-slate-600"
+              )}
+            >
+              <MoonIconBold className="text-dark-grey text-xl" />
+            </Button>
+          )}
+
           {access_token ? (
             <>
               <Link to="/dashboard/notifications">
-                <Button className="w-12 h-12 rounded-full flex items-center justify-center bg-grey relative hover:bg-black/10">
+                <Button
+                  className={
+                    "w-12 h-12 rounded-full flex items-center justify-center bg-grey relative hover:bg-black/10 text-dark-grey " +
+                    (theme === "dark" && "hover:bg-slate-600")
+                  }
+                >
                   <BellIcon className="text-xl block mt-1" />
 
                   {new_notification_available && (

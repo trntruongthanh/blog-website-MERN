@@ -7,6 +7,7 @@ import Button from "@/components/button";
 
 import { UserContext } from "@/App";
 import { BlogContext } from "@/pages/blog.page";
+import { useTheme } from "@/hooks/useTheme";
 
 /*
   User->>Frontend: Click "Post Comment"
@@ -27,12 +28,7 @@ import { BlogContext } from "@/pages/blog.page";
   commentsArr: mảng chứa các comment đã được load (hiển thị trong UI).
 */
 
-const CommentField = ({
-  action,
-  index = undefined,
-  replyingTo = undefined,
-  setIsReplying,
-}) => {
+const CommentField = ({ action, index = undefined, replyingTo = undefined, setIsReplying }) => {
   const {
     userAuth: { access_token, username, fullname, profile_img },
   } = useContext(UserContext);
@@ -54,6 +50,8 @@ const CommentField = ({
   const total_comments = activity?.total_comments ?? 0;
   const total_parent_comments = activity?.total_parent_comments ?? 0;
 
+  const { theme, setTheme } = useTheme();
+
   //========================================================================================
 
   // console.log(blog);
@@ -64,7 +62,7 @@ const CommentField = ({
   /*
     .trim() bỏ hết khoảng trắng đầu/cuối (bao gồm xuống dòng, tab).
     Nếu sau khi trim còn rỗng ⇒ không có nội dung hợp lệ.
-  */  
+  */
   const hasComment = comment.trim() !== ""; // xử lý nút comment khi có nội dung
 
   //========================================================================================
@@ -242,10 +240,10 @@ const CommentField = ({
         onClick={handleComment}
         disabled={!hasComment}
         className={clsx(
-          "mt-2 mb-4 border border-lavender bg-white text-black px-4 py-2 rounded-md",
-          {
-            "btn-shadow hover:bg-gray-200": hasComment,
-          }
+          "mt-2 mb-4 border border-lavender bg-white text-black px-4 py-2 rounded-md ",
+          hasComment && theme === "light"
+            ? "btn-shadow hover:bg-gray-200"
+            : "bg-gray-700 hover:bg-gray-600"
         )}
       >
         {action}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import clsx from "clsx";
 import { useEffect, useState } from "react";
 
 import AnimationWrapper from "../common/page-animation";
@@ -14,12 +15,16 @@ import NoDataMessage from "../components/nodata.component";
 import filterPaginationData from "../common/filter-pagination-data";
 import LoadMoreDataBtn from "../components/load-more.component";
 
+import { useTheme } from "@/hooks/useTheme";
+
 const HomePage = () => {
   const [blogs, setBlogs] = useState(null);
 
   const [trendingBlogs, setTrendingBlogs] = useState(null);
 
-  const [pageState, setPageState] = useState("home");  // quản lý tags
+  const [pageState, setPageState] = useState("home"); // quản lý tags
+
+  const { theme, setTheme } = useTheme();
 
   const NAV_ROUTES = [pageState, "trending blogs"];
 
@@ -38,10 +43,9 @@ const HomePage = () => {
 
   const fetchLatestBlogs = async ({ page = 1 }) => {
     try {
-      const { data } = await axios.post(
-        import.meta.env.VITE_SERVER_DOMAIN + "/latest-blogs",
-        { page }
-      );
+      const { data } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/latest-blogs", {
+        page,
+      });
 
       // console.log(data.blogs);
 
@@ -52,7 +56,6 @@ const HomePage = () => {
         countRoute: "/all-latest-blogs-count",
       });
 
-    
       if (!formattedData) {
         throw new Error("Failed to format pagination data");
       }
@@ -69,9 +72,7 @@ const HomePage = () => {
 
   const fetchTrendingBlogs = async () => {
     try {
-      const { data } = await axios.get(
-        import.meta.env.VITE_SERVER_DOMAIN + "/trending-blogs"
-      );
+      const { data } = await axios.get(import.meta.env.VITE_SERVER_DOMAIN + "/trending-blogs");
 
       if (!data.blogs) {
         throw new Error("No blogs data received");
@@ -87,10 +88,10 @@ const HomePage = () => {
 
   const fetchBlogByCategory = async ({ page = 1 }) => {
     try {
-      const { data } = await axios.post(
-        import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs",
-        { tag: pageState, page }
-      );
+      const { data } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {
+        tag: pageState,
+        page,
+      });
 
       let formattedData = await filterPaginationData({
         state: blogs,
@@ -120,10 +121,8 @@ const HomePage = () => {
   */
 
   useEffect(() => {
-
     if (pageState === "home") {
       fetchLatestBlogs({ page: 1 });
-
     } else {
       fetchBlogByCategory({ page: 1 });
     }
@@ -148,7 +147,7 @@ const HomePage = () => {
     Nếu chọn một category mới, cập nhật pageState để useEffect biết và gọi fetchBlogByCategory.
   */
   const loadBlogByCategory = (event) => {
-    let category = event.target.innerText.toLowerCase();  // Nó là thuộc tính DOM dùng để lấy ra nội dung hiển thị (text) bên trong một phần tử HTML.
+    let category = event.target.innerText.toLowerCase(); // Nó là thuộc tính DOM dùng để lấy ra nội dung hiển thị (text) bên trong một phần tử HTML.
 
     setBlogs(null);
 
@@ -164,10 +163,7 @@ const HomePage = () => {
     <AnimationWrapper>
       <section className="h-cover flex justify-center gap-10">
         <div className="w-full">
-          <InPageNavigation
-            routes={NAV_ROUTES}
-            defaultHidden={["trending blogs"]}
-          >
+          <InPageNavigation  routes={NAV_ROUTES} defaultHidden={["trending blogs"]}>
             {/* latest blogs */}
             {/* → là cú pháp đúng vì:
               blogs là object
@@ -193,9 +189,7 @@ const HomePage = () => {
 
               <LoadMoreDataBtn
                 state={blogs}
-                fetchDataFunc={
-                  pageState === "home" ? fetchLatestBlogs : fetchBlogByCategory
-                }
+                fetchDataFunc={pageState === "home" ? fetchLatestBlogs : fetchBlogByCategory}
               />
             </>
 
@@ -218,7 +212,6 @@ const HomePage = () => {
                 <NoDataMessage message="No trending blogs" />
               )}
             </>
-            
           </InPageNavigation>
         </div>
 
@@ -226,9 +219,7 @@ const HomePage = () => {
         <div className="min-w-[40%] lg:min-w-[400px] max-w-min border-l border-grey pl-8 pt-3 max-md:hidden">
           <div className="flex flex-col gap-10">
             <div>
-              <h1 className="font-medium text-xl mb-8">
-                Stories form all interests
-              </h1>
+              <h1 className="font-medium text-xl mb-8">Stories form all interests</h1>
 
               <div className="flex gap-3 flex-wrap">
                 {categories.map((category, index) => {
@@ -236,10 +227,11 @@ const HomePage = () => {
                     <Button
                       onClick={loadBlogByCategory}
                       key={index}
-                      className={
-                        "tag " +
-                        (pageState === category ? " bg-black text-white" : " ")
-                      }
+                      className={clsx(
+                        "tag",
+                        theme === "dark" && "hover:bg-slate-600",
+                        pageState === category && "bg-black text-white"
+                      )}
                     >
                       {category}
                     </Button>

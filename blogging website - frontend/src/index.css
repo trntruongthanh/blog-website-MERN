@@ -1,9 +1,14 @@
+/* 1) Import font/icon trước */
 @import url('https://fonts.googleapis.com/css2?family=Gelasio&family=Inter:wght@400;500&display=swap');
-@import "@flaticon/flaticon-uicons/css/all/all";
+@import "@flaticon/flaticon-uicons/css/all/all.css";
+@import "./editor-theme.css";
 
+/* 2) Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 3) Sau cùng mới import file muốn GHI ĐÈ (theme của Editor.js) */
 
 /*
     sm	≥ 640px	điện thoại lớn / tablet đứng
@@ -34,6 +39,7 @@
 
 
 /*=========================== Global Styles (@layer components) ===========================*/
+
 @layer components {
     * {
         @apply m-0 p-0 box-border text-base outline-purple/30 duration-100;
@@ -41,10 +47,11 @@
 
     html {
         @apply overflow-x-hidden;
+        scrollbar-gutter: stable;
     }
 
     body {
-        @apply font-inter font-normal text-black;
+        @apply font-inter font-normal text-black bg-white;
     }
 
     i {
@@ -65,6 +72,7 @@
 
 
     /*=========================== Navbar & Layout ===========================*/
+
     .navbar {
         @apply z-10 sticky top-0 flex items-center gap-12 w-full px-[5vw] py-5 h-[80px] border-b border-grey bg-white;
     }
@@ -84,6 +92,7 @@
 
 
     /*=========================== Nút bấm (Button) ===========================*/
+
     .btn-dark {
         @apply whitespace-nowrap bg-black text-white rounded-full py-3 px-6 text-xl capitalize hover:bg-opacity-80;
     }
@@ -98,6 +107,7 @@
 
 
     /*===========================Input Field===========================*/
+
     .input-box {
         @apply w-[100%] rounded-md p-4 bg-grey pl-12 border border-grey focus:bg-transparent placeholder:text-black;
     }
@@ -119,7 +129,9 @@
         @apply text-dark-grey hover:text-black hover:bg-grey p-3 px-4 block opacity-75;
     }
 
+
     /*===========================Hiển thị / Ẩn phần tử===========================*/
+
     .hide {
         @apply opacity-0 pointer-events-none duration-100;
     }
@@ -129,6 +141,7 @@
     }
 
     /*===========================Sidebar================================*/
+
     .sidebar-link {
         @apply flex gap-4 items-center py-5 text-dark-grey hover:text-black border-transparent;
     }
@@ -137,7 +150,17 @@
         @apply text-black border-r-2 border-purple/60 pl-6 bg-purple/10 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
     }
 
-    /*===========================Bài viết Blog===========================*/
+    /* Dark mode */
+    .sidebar-link-dark {
+        @apply flex gap-4 items-center py-5 text-dark-grey hover:text-black border-transparent;
+    }
+
+    .sidebar-link-dark.active {
+        @apply text-black border-r-2 border-slate-600 pl-6 bg-slate-500 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
+    }
+
+    /*===========================Bài viết Blog=========================================*/
+
     #textEditor h2,
     h2 {
         @apply font-inter text-4xl leading-normal font-bold max-md:text-3xl max-md:leading-snug !important;
@@ -226,6 +249,7 @@
 
 
 /*===========================Tùy chỉnh Editor.js===========================*/
+
 .ce-block__content,
 .ce-toolbar__content {
     max-width: 900px;
@@ -235,4 +259,33 @@
 .cdx-settings-button[data-tune='withBackground'],
 .cdx-settings-button[data-tune='stretched'] {
     display: none;
+}
+
+.blog-page-content a {
+    color: #7DD3FC;
+    /* pastel xanh dương */
+    text-decoration: underline;
+    transition: color .2s ease;
+}
+
+.blog-page-content a:hover {
+    color: #38BDF8;
+    /* xanh blue-700 */
+}
+
+
+/*===========================dark theme===========================*/
+
+[data-theme="light"],
+[data-theme="dark"] {
+    transition: background-color 0.2s ease, color 0.2s ease;
+    -webkit-transition: background-color 0.2s ease, color 0.2s ease;
+    -moz-transition: background-color 0.2s ease, color 0.2s ease;
+    -ms-transition: background-color 0.2s ease, color 0.2s ease;
+    -o-transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body[data-theme="dark"] ::selection {
+    background: #c4b5fd;
+    color: #fff;
 }

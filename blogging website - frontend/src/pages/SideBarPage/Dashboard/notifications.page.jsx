@@ -12,9 +12,9 @@ import AnimationWrapper from "@/common/page-animation";
 import NotificationCard from "@/components/notification/notification-card.component";
 import NoDataMessage from "@/components/nodata.component";
 import LoadMoreDataBtn from "@/components/load-more.component";
+import { useTheme } from "@/hooks/useTheme";
 
 const Notifications = () => {
-  
   const FILTERS = [
     { label: "all", value: "all" },
     { label: "likes", value: "like" },
@@ -32,6 +32,8 @@ const Notifications = () => {
     userAuth: { access_token, new_notification_available },
     setUserAuth,
   } = useContext(UserContext);
+
+  const { theme, setTheme } = useTheme();
 
   //====================================================================================================
 
@@ -57,7 +59,7 @@ const Notifications = () => {
         setUserAuth((prev) => ({
           ...prev,
           new_notification_available: false,
-        }))
+        }));
       }
 
       const formattedData = await filterPaginationData({
@@ -70,19 +72,16 @@ const Notifications = () => {
       });
 
       setNotifications(formattedData);
-
     } catch (error) {
       console.log(error.message);
     }
   };
-
 
   useEffect(() => {
     if (access_token) {
       fetchNotifications({ page: 1 });
     }
   }, [access_token, filter]);
-
 
   useEffect(() => {
     if (notifications) {
@@ -93,7 +92,6 @@ const Notifications = () => {
   //=======================================================================================================
 
   const handleFilter = (value) => {
-
     setFilter(value);
     setNotifications(null);
   };
@@ -109,14 +107,18 @@ const Notifications = () => {
 
   return (
     <div>
-      <h1 className="max-md:hidden mt-4">Recent Notifications</h1>
+      <h1 className="max-md:hidden md:mt-8">Recent Notifications</h1>
 
       <div className="my-8 flex gap-6">
         {FILTERS.map(({ label, value }) => (
           <Button
             key={value}
             onClick={() => handleFilter(value)}
-            className={"text-sm py-2 " + (filter === value ? " btn-dark" : " btn-light")}
+            className={
+              "text-sm py-2 " +
+              (filter === value ? " btn-dark" : " btn-light") +
+              (theme === "dark" ? " hover:bg-slate-600" : " ")
+            }
           >
             {label}
           </Button>

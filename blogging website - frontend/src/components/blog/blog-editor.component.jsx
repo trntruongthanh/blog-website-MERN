@@ -4,12 +4,12 @@ import { useContext, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import EditorJS from "@editorjs/editorjs";
 
-
-import { uploadImage } from "@/common/cloudinary"
+import { uploadImage } from "@/common/cloudinary";
 
 import images from "@/assets/imgs/images";
 import AnimationWrapper from "@/common/page-animation";
 
+import { useTheme } from "@/hooks/useTheme";
 import { EditorContext } from "@/pages/editor.pages";
 import { UserContext } from "@/App";
 import { tools } from "../tools.component";
@@ -25,6 +25,8 @@ const BlogEditor = () => {
 
   const { blog_id } = useParams();
 
+  const { theme, setTheme } = useTheme();
+
   const navigate = useNavigate();
 
   //=========================================================================================
@@ -39,9 +41,9 @@ const BlogEditor = () => {
     // Nếu editor chưa tồn tại hoặc chưa sẵn sàng => khởi tạo mới
     if (!textEditor || !textEditor.isReady) {
       editorInstance = new EditorJS({
-        holder: "textEditor",                                   // ID của phần tử HTML sẽ chứa editor
-        data: Array.isArray(content) ? content[0] : content,    // Dữ liệu hiện tại của blog (dùng cho khi edit lại)
-        tools: tools,                                           // Bộ công cụ được cấu hình (Header, List, Quote, v.v...)   
+        holder: "textEditor", // ID của phần tử HTML sẽ chứa editor
+        data: Array.isArray(content) ? content[0] : content, // Dữ liệu hiện tại của blog (dùng cho khi edit lại)
+        tools: tools, // Bộ công cụ được cấu hình (Header, List, Quote, v.v...)
         placeholder: "Let's write an awesome story",
       });
 
@@ -50,10 +52,8 @@ const BlogEditor = () => {
     }
 
     return () => {
-
       // Nếu editorInstance tồn tại và có hàm destroy
       if (editorInstance && editorInstance.destroy) {
-
         // Đợi editor sẵn sàng rồi mới destroy (tránh lỗi)
         editorInstance.isReady
           .then(() => {
@@ -105,7 +105,7 @@ const BlogEditor = () => {
     }
   };
 
-  //=======================================================================================
+  //==============================================================================================
 
   const handleTitleKeyDown = (event) => {
     if (event.keyCode === 13) {
@@ -122,13 +122,13 @@ const BlogEditor = () => {
     setBlog({ ...blog, title: input.value });
   };
 
-  //=======================================================================================
+  //=============================================================================================
 
   const handleError = (event) => {
-    event.target.src = images.blogBanner;
+    event.target.src = theme === "light" ? images.blogBanner : images.blogBannerDark;
   };
 
-  //========================================================================================
+  //=============================================================================================
 
   const handlePublish = async () => {
     // console.log("isReady:", textEditor);
@@ -147,13 +147,12 @@ const BlogEditor = () => {
     */
 
     try {
-      await textEditor.isReady;                   // Đảm bảo trình soạn thảo đã sẵn sàng
-      const content = await textEditor.save();   // Lấy nội dung hiện tại từ editor
+      await textEditor.isReady; // Đảm bảo trình soạn thảo đã sẵn sàng
+      const content = await textEditor.save(); // Lấy nội dung hiện tại từ editor
 
       if (content.blocks.length) {
         setBlog({ ...blog, content: content });
         setEditorState("publish");
-        
       } else {
         toast.error("Write something in your blog to publish it.");
       }
@@ -163,7 +162,7 @@ const BlogEditor = () => {
     }
   };
 
-  //================================================================================
+  //==========================================================================================
 
   const handleSaveDraft = async (event) => {
     if (event.target.className.includes("disable")) {
@@ -207,14 +206,11 @@ const BlogEditor = () => {
       setTimeout(() => {
         navigate("/dashboard/blogs?tab=draft");
       }, 500);
-      
     } catch (error) {
       event.target.classList.remove("disable");
       toast.dismiss(loadingToast);
 
-      return toast.error(
-        error.response?.data?.error || "Something went wrong!"
-      );
+      return toast.error(error.response?.data?.error || "Something went wrong!");
     }
   };
 
@@ -224,7 +220,7 @@ const BlogEditor = () => {
     <>
       <nav className="navbar">
         <Link className="flex-none w-10" to="/">
-          <img className="w-full" src={images.logo}></img>
+          <img className="w-full" src={theme === "light" ? images.logo : images.logoWhite}></img>
         </Link>
 
         <p className="max-md:hidden text-black line-clamp-1 w-full">
@@ -267,7 +263,7 @@ const BlogEditor = () => {
 
             <textarea
               defaultValue={title}
-              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40"
+              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 bg-white"
               placeholder="Blog Title"
               onKeyDown={handleTitleKeyDown}
               onChange={handleTitleChange}

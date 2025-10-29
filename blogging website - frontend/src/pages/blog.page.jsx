@@ -3,6 +3,7 @@ import "tippy.js/dist/tippy.css";
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useTheme } from "@/hooks/useTheme";
 
 import AnimationWrapper from "../common/page-animation";
 import { formatDateOnly, formatTimeAgo } from "../common/date";
@@ -37,7 +38,7 @@ const BlogPage = () => {
 
   const [isLikedByUser, setIsLikedByUser] = useState(false);
 
-  const [commentsWrapper, setCommentsWrapper] = useState(true);
+  const [commentsWrapper, setCommentsWrapper] = useState(false);
 
   const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0); //  để cập nhật số lượng comment cha đã tải.
 
@@ -50,6 +51,8 @@ const BlogPage = () => {
     },
     publishedAt,
   } = blog;
+
+  const { theme, setTheme } = useTheme();
 
   // ========================================================================================
 

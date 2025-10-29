@@ -148,6 +148,7 @@ const UserAuthForm = ({ type }) => {
 
           <InputBox
             name="email"
+            autoComplete="email"
             type="email"
             placeholder="Email"
             icon="email"

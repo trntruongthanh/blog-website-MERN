@@ -18,6 +18,8 @@ import EditProfile from "./pages/SideBarPage/SettingsSidebar/edit-profile.page";
 import Notifications from "./pages/SideBarPage/Dashboard/notifications.page";
 import ManageBlogsSidebar from "./pages/SideBarPage/Dashboard/manage-blogs.page";
 
+import { ThemeProvider } from "./context/theme-context";
+
 /*
   Điểm cần lưu ý
   Navbar đang được dùng như một layout cha, nhưng trong react-router-dom v6, cần có <Outlet /> trong Navbar để render nội dung của các route con.
@@ -85,39 +87,41 @@ const App = () => {
   */
 
   return (
-    <UserContext.Provider value={value}>
-      <Routes>
-        <Route path="/editor" element={<Editor />} />
-        <Route path="/editor/:blog_id" element={<Editor />} />
+    <ThemeProvider>
+      <UserContext.Provider value={value}>
+        <Routes>
+          <Route path="/editor" element={<Editor />} />
+          <Route path="/editor/:blog_id" element={<Editor />} />
 
-        <Route path="/" element={<Navbar />}>
-          <Route index element={<HomePage />} />
+          <Route path="/" element={<Navbar />}>
+            <Route index element={<HomePage />} />
 
-          <Route path="dashboard" element={<SideNav />}>
-            <Route path="blogs" element={<ManageBlogsSidebar />} />
-            <Route path="notifications" element={<Notifications />} />
+            <Route path="dashboard" element={<SideNav />}>
+              <Route path="blogs" element={<ManageBlogsSidebar />} />
+              <Route path="notifications" element={<Notifications />} />
+            </Route>
+
+            <Route path="settings" element={<SideNav />}>
+              <Route path="edit-profile" element={<EditProfile />} />
+              <Route path="change-password" element={<ChangePassword />} />
+            </Route>
+
+            <Route path="signin" element={<UserAuthForm type="sign-in" />} />
+            <Route path="signup" element={<UserAuthForm type="sign-up" />} />
+
+            <Route path="search/:query" element={<SearchPage />} />
+            <Route path="blog/:blog_id" element={<BlogPage />} />
+            <Route path="trending-blog/:blog_id" element={<BlogPage />} />
+
+            <Route path="user/:id" element={<ProfilePage />} />
+
+            <Route path="/dashboard/notification" element={<h1>Notification</h1>} />
+
+            <Route path="*" element={<PageNotFound />} />
           </Route>
-
-          <Route path="settings" element={<SideNav />}>
-            <Route path="edit-profile" element={<EditProfile />} />
-            <Route path="change-password" element={<ChangePassword />} />
-          </Route>
-
-          <Route path="signin" element={<UserAuthForm type="sign-in" />} />
-          <Route path="signup" element={<UserAuthForm type="sign-up" />} />
-
-          <Route path="search/:query" element={<SearchPage />} />
-          <Route path="blog/:blog_id" element={<BlogPage />} />
-          <Route path="trending-blog/:blog_id" element={<BlogPage />} />
-
-          <Route path="user/:id" element={<ProfilePage />} />
-
-          <Route path="/dashboard/notification" element={<h1>Notification</h1>} />
-
-          <Route path="*" element={<PageNotFound />} />
-        </Route>
-      </Routes>
-    </UserContext.Provider>
+        </Routes>
+      </UserContext.Provider>
+    </ThemeProvider>
   );
 };
 

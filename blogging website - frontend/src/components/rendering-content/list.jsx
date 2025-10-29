@@ -15,7 +15,7 @@ const List = ({ items, style }) => {
 
   return (
     <Tag
-      className={`pl-5 ${style === "ordered" ? "list-decimal" : "list-disc"}`}
+      className={`pl-5 blog-page-content ${style === "ordered" ? "list-decimal" : "list-disc"}`}
     >
       {items.map((listItem, index) => (
         <li

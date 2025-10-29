@@ -7,9 +7,9 @@ import { formatDateOnly } from "@/common/date";
 
 import Button from "../button";
 import NotificationCommentField from "./notification-comment-field.component";
+import { useTheme } from "@/hooks/useTheme";
 
 const NotificationCard = ({ data, index, notificationState }) => {
-
   // `user` ở đây là "actor" (người thực hiện hành động: like/comment/reply), KHÔNG PHẢI current user
   const {
     _id: notification_id,
@@ -45,12 +45,13 @@ const NotificationCard = ({ data, index, notificationState }) => {
 
   const [isReplying, setIsReplying] = useState(false);
 
+  const { theme, setTheme } = useTheme();
+
   // =========================================================================================
 
   // ==== Lấy nội dung & chủ của comment chính ====
   const commentBlog = commentObj?.comment;
   const commentedBy = commentObj?.commented_by;
-
 
   // check chỉ được xóa comment của chủ sở hữu
   // Nếu chưa populate: là ObjectId -> typeof === 'string' (hoặc 'object' nhưng không có personal_info), ta fallback undefined
@@ -59,24 +60,21 @@ const NotificationCard = ({ data, index, notificationState }) => {
       ? commentedBy.personal_info?.username
       : undefined;
 
-      
   // ==== Chủ của reply (nếu có reply block render bên dưới)
   const replyOwnerUsername =
     reply?.commented_by && typeof reply.commented_by === "object"
       ? reply.commented_by.personal_info?.username
       : undefined;
-      
 
   // ✅ Chuẩn hoá thành _id (string)
-  const blogAuthorId = blog_author && typeof blog_author === "object" ? blog_author._id : blog_author;
-  
+  const blogAuthorId =
+    blog_author && typeof blog_author === "object" ? blog_author._id : blog_author;
 
   useEffect(() => {
     console.log(data);
   });
 
   // =========================================================================================
-
 
   // Toggle mở/đóng ô reply cho notification này
   const handleReplies = () => {
@@ -123,7 +121,6 @@ const NotificationCard = ({ data, index, notificationState }) => {
         totalDocs: type === "comment" ? totalDocs - 1 : totalDocs,
         deleteDocCount: (notifications.deleteDocCount ?? 0) + 1,
       });
-      
     } catch (error) {
       console.log(error);
     } finally {
@@ -135,7 +132,8 @@ const NotificationCard = ({ data, index, notificationState }) => {
 
   // Chỉ hiện nút Delete khi current user là chủ comment/reply
   const isOwnerOfComment = Boolean(access_token) && author_username === commented_by_username;
-  const isOwnerOfReply = Boolean(access_token) && (reply?.mine || author_username === replyOwnerUsername);
+  const isOwnerOfReply =
+    Boolean(access_token) && (reply?.mine || author_username === replyOwnerUsername);
 
   return (
     <div className={"p-6 border-b border-grey border-l-dark-grey " + (!seen ? "border-l-2" : "")}>
@@ -193,7 +191,13 @@ const NotificationCard = ({ data, index, notificationState }) => {
           <div className="ml-10">
             {/* Nếu chưa có reply đính kèm -> cho phép mở ô reply */}
             {!reply ? (
-              <Button onClick={handleReplies} className="hover:text-black p-2 rounded-md mr-2">
+              <Button
+                onClick={handleReplies}
+                className={
+                  "hover:text-black p-2 rounded-md mr-2 " +
+                  (theme === "dark" ? "hover:bg-slate-600" : " ")
+                }
+              >
                 Reply
               </Button>
             ) : (
@@ -276,7 +280,10 @@ const NotificationCard = ({ data, index, notificationState }) => {
           {isOwnerOfReply && (
             <Button
               onClick={(event) => handleDelete(reply._id, "reply", event.currentTarget)}
-              className="text-dark-grey p-2 rounded-md hover:text-black ml-14 mt-2"
+              className={
+                "text-dark-grey p-2 rounded-md hover:text-black ml-14 mt-2 " +
+                (theme === "dark" ? "hover:bg-slate-600" : " ")
+              }
             >
               Delete
             </Button>

@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Navigate, NavLink, Outlet } from "react-router-dom";
 
 import { UserContext } from "@/App";
+import { useTheme } from "@/hooks/useTheme";
 
 import {
   BarsIcon,
@@ -13,13 +14,15 @@ import {
   UserIcon,
 } from "@/Icons";
 import Button from "./button";
+import clsx from "clsx";
 
 const SideNav = () => {
-  
   const {
     userAuth,
     userAuth: { access_token },
   } = useContext(UserContext);
+
+  const { theme, setTheme } = useTheme();
 
   const new_notification_available = userAuth?.new_notification_available;
 
@@ -162,7 +165,6 @@ const SideNav = () => {
   ) : (
     <>
       <section className="relative flex gap-10 py-0 m-0 max-md:flex-col">
-
         {/* Sidebar bên trái */}
         <div className="sticky top-[80px] z-30">
           <div className="md:hidden bg-white py-1 border-b border-grey flex flex-nowrap overflow-x-auto">
@@ -198,7 +200,7 @@ const SideNav = () => {
             | `md:border-grey md:border-r` | Viền phải                                                                        |
             | `md:pr-0`                    | Không padding phải                                                               |
 
-            Cách hoạt động trên mobile (max-md:):
+            Cách hoạt động trên mobile (max-md:)
             | Class                        | Ý nghĩa                                                             |
             | ---------------------------- | ------------------------------------------------------------------- |
             | `absolute`                   | Sidebar thoát khỏi flow, đè lên nội dung                            |
@@ -225,7 +227,7 @@ const SideNav = () => {
             <NavLink
               to="/dashboard/blogs"
               onClick={(event) => setPageState(event.target.innerText)}
-              className="sidebar-link"
+              className={theme === "light" ? "sidebar-link" : "sidebar-link-dark"}
             >
               <BlogIcon />
               Blogs
@@ -234,7 +236,7 @@ const SideNav = () => {
             <NavLink
               to="/dashboard/notifications"
               onClick={(event) => setPageState(event.target.innerText)}
-              className="sidebar-link"
+              className={theme === "light" ? "sidebar-link" : "sidebar-link-dark"}
             >
               <div className="relative">
                 <BellIcon />
@@ -248,7 +250,7 @@ const SideNav = () => {
             <NavLink
               to="/dashboard/editor"
               onClick={(event) => setPageState(event.target.innerText)}
-              className="sidebar-link"
+              className={theme === "light" ? "sidebar-link" : "sidebar-link-dark"}
             >
               <FileEditIcon />
               Write
@@ -262,7 +264,7 @@ const SideNav = () => {
             <NavLink
               to="/settings/edit-profile"
               onClick={(event) => setPageState(event.target.innerText)}
-              className="sidebar-link"
+              className={theme === "light" ? "sidebar-link" : "sidebar-link-dark"}
             >
               <UserIcon />
               Editor Profile
@@ -271,7 +273,7 @@ const SideNav = () => {
             <NavLink
               to="/settings/change-password"
               onClick={(event) => setPageState(event.target.innerText)}
-              className="sidebar-link"
+              className={theme === "light" ? "sidebar-link" : "sidebar-link-dark"}
             >
               <PasswordIcon />
               Change Password
@@ -280,12 +282,10 @@ const SideNav = () => {
         </div>
 
         {/* Nội dung route con bên phải */}
-        <div className="flex-1">
+        <div className="flex-1 h-[calc(100vh-80px)]">
           <Outlet />
         </div>
-        
       </section>
-
     </>
   );
 };

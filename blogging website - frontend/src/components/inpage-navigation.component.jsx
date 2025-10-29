@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Button from "./button";
+import { useTheme } from "@/hooks/useTheme";
 
 /*
   routes: danh sách tên tab (mảng string).
@@ -18,7 +19,6 @@ const InPageNavigation = ({
   snapBreakpoint = 768,
   children,
 }) => {
-
   /*
       Khi rộng màn hình ≥ 768px (md breakpoint), tab "trending blogs" sẽ hiển thị ở sidebar.
     => Nếu người dùng đang ở tab "trending blogs" trong InPageNavigation (mobile),
@@ -34,6 +34,7 @@ const InPageNavigation = ({
 
   const [inPageNavIndex, setInPageNavIndex] = useState(defaultActiveIndex);
 
+  const { theme, setTheme } = useTheme();
 
   //==============================================================================================
 
@@ -54,13 +55,26 @@ const InPageNavigation = ({
     setInPageNavIndex(index);
   };
 
-
   //============================================================================================
+
+  /*
+  useLayoutEffect lúc mount / khi routes hoặc defaultActiveIndex đổi
+  → đảm bảo underline được căn ngay từ lần render đầu (tránh tình trạng refresh xong mà gạch chưa hiện).
+
+  useEffect resize listener
+  → chỉ chạy khi cửa sổ thay đổi kích thước (và có logic autoSnapOnDesktop). Nó không thay thế được useLayoutEffect.
+  */
+  useLayoutEffect(() => {
+    // underline ngay lần render đầu
+    if (activeTabRef.current) {
+      changPageState(activeTabRef.current, defaultActiveIndex);
+    }
+    // khi routes đổi hoặc defaultActiveIndex đổi, cũng căn lại
+  }, [routes, defaultActiveIndex]);
 
   // Nếu đang ở tab trending (index !== default) và resize lên desktop (≥768),
   // Effect “auto snap về tab mặc định” khi resize
   useEffect(() => {
-
     // nếu autoSnapOnDesktop === false → không làm gì (không gắn listener).
     if (!autoSnapOnDesktop) return;
 
@@ -69,11 +83,9 @@ const InPageNavigation = ({
 
       // Nếu >= snapBreakpoint và đang ở tab khác tab mặc định
       if (w >= snapBreakpoint && inPageNavIndex !== defaultActiveIndex) {
-
         // Gọi chung hàm để set underline + index
         if (activeTabRef.current) {
           changPageState(activeTabRef.current, defaultActiveIndex);
-
         } else {
           // Fallback (hiếm khi xảy ra)
           setInPageNavIndex(defaultActiveIndex);
@@ -84,13 +96,10 @@ const InPageNavigation = ({
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-
-  }, [inPageNavIndex, defaultActiveIndex]);
-
+  }, [autoSnapOnDesktop, snapBreakpoint, inPageNavIndex, defaultActiveIndex]);
 
   //================================================================================================
 
-  
   /*
     React ngầm hiểu rằng bạn đang truyền nhiều phần tử con (children) vào InPageNavigation. Và khi có nhiều phần tử cùng cấp, React sẽ tự gom chúng thành một mảng.
     {Array.isArray(children) ? children[inPageNavIndex] : children}
@@ -109,7 +118,8 @@ const InPageNavigation = ({
               className={
                 "p-4 px-5 capitalize " +
                 (inPageNavIndex === index ? "text-black" : "text-dark-grey ") +
-                (defaultHidden.includes(route) ? "md:hidden " : " ")
+                (defaultHidden.includes(route) ? "md:hidden " : " ") +
+                (theme === "dark" ? "hover:bg-slate-600" : " ")
               }
             >
               {route}
@@ -119,7 +129,7 @@ const InPageNavigation = ({
 
         <hr
           ref={activeTabLineRef}
-          className="absolute bottom-0 h-[2px] bg-black transition-all duration-300"
+          className="absolute bottom-0 h-[2px] bg-black transition-all duration-300 border-dark-grey"
         />
       </div>
 

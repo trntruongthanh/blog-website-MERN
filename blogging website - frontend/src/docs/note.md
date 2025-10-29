@@ -66,3 +66,22 @@ multipart/form-data Upload file multer
 
 📌 Ví dụ dùng express.urlencoded() để nhận dữ liệu từ form HTML
 server.use(express.urlencoded({ extended: true }));
+
+============================================================================================
+Quy tắc đuôi file cho custom hooks
+.js hoặc .ts (nếu dùng TypeScript) → phổ biến nhất.
+👉 Vì hook chỉ là hàm logic (không return JSX).
+.jsx hoặc .tsx → hiếm khi dùng cho hook, chỉ dùng khi trong hook bạn trực tiếp render JSX (trường hợp rất ít).
+
+src/
+ ├── context/
+ │    └── ThemeContext.jsx    // Provider + JSX
+ │
+ ├── hooks/
+ │    ├── useTheme.js         // Hook logic (không JSX)
+ │    ├── useDebounce.js
+ │    └── useFetch.js
+ │
+ ├── components/
+ │    ├── Navbar.jsx
+ │    └── Button.jsx

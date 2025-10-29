@@ -1,10 +1,12 @@
 import axios from "axios";
+import clsx from "clsx";
 import { useContext, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 import { UserContext } from "@/App";
 import { BlogContext } from "@/pages/blog.page";
+import { useTheme } from "@/hooks/useTheme";
 
 import Button from "../button";
 
@@ -42,6 +44,8 @@ const BlogInteraction = () => {
   const {
     userAuth: { username, access_token },
   } = useContext(UserContext);
+
+  const { theme, setTheme } = useTheme();
 
   // =========================== CHECK LIKE LÚC LOAD ============================
   useEffect(() => {
@@ -83,7 +87,7 @@ const BlogInteraction = () => {
     // Lấy giá trị mới sau khi đảo trạng thái like
     const newIsLikedByUser = !isLikedByUser;
 
-    // // Cập nhật UI trước để tạo cảm giác phản hồi nhanh (optimistic update)
+    // Cập nhật UI trước để tạo cảm giác phản hồi nhanh (optimistic update)
     const updatedLikes = newIsLikedByUser ? total_likes + 1 : total_likes - 1;
 
     setIsLikedByUser(newIsLikedByUser);
@@ -121,14 +125,20 @@ const BlogInteraction = () => {
           {isLikedByUser ? (
             <Button
               onClick={handleLike}
-              className="hover:bg-pink-pastel gap-1 w-8 h-8 bg-red/20 rounded-full flex items-center justify-center"
+              className={clsx(
+                "hover:bg-pink-pastel w-8 h-8 bg-grey/80 rounded-full flex items-center justify-center",
+                theme === "dark" && "hover:bg-rose-400/30"
+              )}
             >
               <LikedIcon className="text-red w-4 h-4 " />
             </Button>
           ) : (
             <Button
               onClick={handleLike}
-              className="hover:bg-pink-pastel w-8 h-8 bg-grey/80 rounded-full flex items-center justify-center"
+              className={clsx(
+                "hover:bg-pink-pastel bg-red/20 gap-1 w-8 h-8 rounded-full flex items-center justify-center",
+                theme === "dark" && "hover:bg-slate-700 bg-slate-500/15"
+              )}
             >
               <LikeIcon className="text-dark-grey w-4 h-4" />
             </Button>
@@ -138,7 +148,10 @@ const BlogInteraction = () => {
 
           <Button
             onClick={() => setCommentsWrapper((prevValue) => !prevValue)}
-            className=" w-8 h-8 bg-grey/80 rounded-full flex items-center justify-center"
+            className={clsx(
+              "w-8 h-8 bg-grey/80 rounded-full flex items-center justify-center",
+              theme === "dark" && "hover:bg-slate-600 bg-slate-500/15"
+            )}
           >
             <CommentIcon className="text-dark-grey w-4 h-4 " />
           </Button>
@@ -149,7 +162,10 @@ const BlogInteraction = () => {
         <div className="flex gap-6 items-center">
           {username === author_username ? (
             <Link
-              className="underline hover:text-purple"
+              className={clsx(
+                "underline hover:text-purple",
+                theme === "dark" && "hover:text-slate-400"
+              )}
               to={`/editor/${blog_id}`}
             >
               Edit

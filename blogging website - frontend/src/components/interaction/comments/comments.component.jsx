@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { useTheme } from "@/hooks/useTheme.js";
 import { BlogContext } from "@/pages/blog.page.jsx";
 
 import Button from "@/components/button/index.js";
@@ -10,6 +11,7 @@ import NoDataMessage from "@/components/nodata.component.jsx";
 import CommentField from "./comment-field.component.jsx";
 import CommentCard from "./comment-card.component.jsx";
 import fetchComments from "@/utils/fetchInteraction/fetchComments.js";
+import clsx from "clsx";
 
 /*
   comment: nội dung text người dùng đang nhập.
@@ -33,6 +35,8 @@ const CommentContainer = () => {
     setBlog,
   } = useContext(BlogContext);
 
+  const { theme, setTheme } = useTheme();
+
   // console.log(commentsArr);
 
   /*
@@ -55,10 +59,8 @@ const CommentContainer = () => {
   // }, [blog]);
 
   const loadMoreComments = async () => {
-
     let newCommentsArr = await fetchComments({
-      
-      skip: totalParentCommentsLoaded,          // bỏ qua n comment đã tải
+      skip: totalParentCommentsLoaded, // bỏ qua n comment đã tải
       blog_id: _id,
       setParentCommentCountFun: setTotalParentCommentsLoaded,
       comment_array: commentsArr,
@@ -82,9 +84,7 @@ const CommentContainer = () => {
     >
       <div className="relative">
         <h1 className="text-xl font-medium">Comment</h1>
-        <p className="text-lg mt-2 w-[70%] text-dark-grey line-clamp-1">
-          {title}
-        </p>
+        <p className="text-lg mt-2 w-[70%] text-dark-grey line-clamp-1">{title}</p>
 
         <Button
           onClick={() => setCommentsWrapper((prev) => !prev)}
@@ -117,7 +117,10 @@ const CommentContainer = () => {
       {total_parent_comments > totalParentCommentsLoaded ? (
         <Button
           onClick={loadMoreComments}
-          className="text-dark-grey mt-4 p-2 px-3 border border-grey rounded-md flex items-center gap-2"
+          className={clsx(
+            "text-dark-grey mt-4 p-2 px-3 border border-grey rounded-md flex items-center gap-2",
+            theme === "dark" && "hover:bg-slate-600 bg-slate-700"
+          )}
         >
           Load More
         </Button>

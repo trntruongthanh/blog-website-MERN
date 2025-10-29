@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import { UserContext } from "@/App";
-import { profileDataStructure } from "../../profile.page";
+import { profileDataStructure } from "@/pages/profile.page";
 
 import AnimationWrapper from "@/common/page-animation";
 import Loader from "@/components/loader.component";
@@ -12,6 +12,7 @@ import Button from "@/components/button";
 import InputBox from "@/components/input.component";
 import { uploadImage } from "@/common/cloudinary";
 import { storeInSession } from "@/common/session";
+import { useTheme } from "@/hooks/useTheme";
 
 const EditProfile = () => {
   const bioLimit = 100;
@@ -35,6 +36,8 @@ const EditProfile = () => {
     personal_info: { fullname, username: profile_username, profile_img, bio, email },
     social_links,
   } = profile;
+
+  const { theme, setTheme } = useTheme();
 
   //==================================================================================================
 
@@ -204,17 +207,14 @@ const EditProfile = () => {
       }
 
       toast.success("Profile updated! 👍🏼");
-
     } catch (error) {
-
       const msg =
         error?.response?.data?.error ||
         error?.response?.data?.message ||
         error?.message ||
         "Update failed!";
-        
-      toast.error(msg);
 
+      toast.error(msg);
     } finally {
       toast.dismiss(loadingToast);
       event.target.removeAttribute("disabled");
@@ -257,7 +257,10 @@ const EditProfile = () => {
 
               <Button
                 onClick={handleImageUpload}
-                className="btn-light mt-5 max-lg:center lg:w-full px-10"
+                className={
+                  "btn-light mt-5 max-lg:center lg:w-full px-10" +
+                  (theme === "dark" ? " bg-slate-700 hover:bg-slate-500" : "")
+                }
               >
                 Upload
               </Button>
@@ -332,7 +335,10 @@ const EditProfile = () => {
 
               <Button
                 onClick={handleSubmitProfile}
-                className="hover:bg-dark-grey active:bg-dark-grey btn-dark bg w-auto px-10 "
+                className={
+                  "hover:bg-dark-grey active:bg-dark-grey bg w-auto px-10 btn-light " +
+                  (theme === "dark" ? " bg-slate-700 hover:bg-slate-500" : "")
+                }
                 type="submit"
               >
                 Update

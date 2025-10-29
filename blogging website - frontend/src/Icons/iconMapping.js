@@ -22,6 +22,8 @@ import {
   TrashIcon,
   UsernameIcon,
   TwitterIcon,
+  MoonIconRegular,
+  MoonIconBold,
 } from "./icon";
 
 export const ICONS = {
@@ -51,4 +53,9 @@ export const SOCIAL_ICONS = {
   website: WebsiteIcon,
   facebook: FacebookIcon,
   twitter: TwitterIcon,
+};
+
+export const Dark_Mode_Icons = {
+  moonRegular: MoonIconRegular,
+  moonBold: MoonIconBold,
 };
