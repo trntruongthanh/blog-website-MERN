@@ -178,8 +178,14 @@ export const searchBlogsCount = async (req, res) => {
 // Tạo blog mới
 export const createBlog = async (req, res) => {
   let authorId = req.user; // ID của tác giả từ middleware verifyJWT
+  let isAdmin = req.admin;
+
+  if (!isAdmin) {
+    return res.status(403).json({ error: "Only admins can create or edit blogs" });
+  }
 
   let { title, des, banner, tags, content, draft, id } = req.body;
+
 
   // Kiểm tra tiêu đề có tồn tại không
   if (!title.length) {
@@ -223,6 +229,7 @@ export const createBlog = async (req, res) => {
   // Tạo blog_id từ title
   let blog_id = id || slugify(title);
 
+
   if (id) {
     try {
       await Blog.findOneAndUpdate(
@@ -234,9 +241,10 @@ export const createBlog = async (req, res) => {
     } catch (error) {
       return res
         .status(500)
-        .json({ error: "Fail to update total posts number" });
+        .json({ error: "Failed to update blog" });
     }
   } else {
+    
     let blog = new Blog({
       title,
       banner,
@@ -247,7 +255,9 @@ export const createBlog = async (req, res) => {
       author: authorId,
       draft: Boolean(draft), // true nếu là bản nháp, false nếu là bài thật
     });
+    
 
+    // ===== CREATE =====
     try {
       // Lưu blog vào database
       const savedBlog = await blog.save();
@@ -430,7 +440,13 @@ export const userWrittenBlogsCount = async (req, res) => {
 
 export const deleteBlog = async (req, res) => {
   const user_id = req.user;
+  const isAdmin = req.admin;
+
   const { blog_id } = req.body;
+
+  if (!isAdmin) {
+    return res.status(500).json({ error: "Only admins can delete blogs" });
+  }
 
   try {
     const blog = await Blog.findOneAndDelete({ blog_id });

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { formatJoined } from "../common/date";
 
 import { SOCIAL_ICONS } from "../Icons";
+import { useTheme } from "@/hooks/useTheme";
 
 const AboutUser = ({ className, dataProfile }) => {
   const {
@@ -11,11 +12,11 @@ const AboutUser = ({ className, dataProfile }) => {
     joinedAt,
   } = dataProfile;
 
+  const { theme, setTheme } = useTheme();
+
   return (
     <div className={"md:w-[90%] md:mt-7 " + className}>
-      <p className="text-xl leading-7">
-        {bio.length ? bio : "Nothing to read here"}
-      </p>
+      <p className="text-xl leading-7">{bio.length ? bio : "Nothing to read here"}</p>
 
       <div className="flex gap-x-7 gap-y-2 my-7 items-center text-dark-grey">
         {Object.keys(social_links).map((key) => {
@@ -31,11 +32,12 @@ const AboutUser = ({ className, dataProfile }) => {
               key={key}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-black transition-colors duration-200"
+              className={
+                "hover:text-black transition-colors duration-200 " +
+                (theme === "dark" ? "hover:text-blue-300" : "")
+              }
             >
-              {IconComponent ? (
-                <IconComponent className="w-6 h-6 text-2xl" />
-              ) : null}
+              {IconComponent ? <IconComponent className="w-6 h-6 text-2xl" /> : null}
             </a>
           );
 
@@ -52,9 +54,7 @@ const AboutUser = ({ className, dataProfile }) => {
         })}
       </div>
 
-      <p className="text-base text-dark-grey leading-7">
-        Joined on {formatJoined(joinedAt)}
-      </p>
+      <p className="text-base text-dark-grey leading-7">Joined on {formatJoined(joinedAt)}</p>
     </div>
   );
 };

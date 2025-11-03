@@ -22,7 +22,7 @@ const Navbar = () => {
   const {
     userAuth,
     setUserAuth,
-    userAuth: { access_token, profile_img },
+    userAuth: { access_token, isAdmin, profile_img },
   } = useContext(UserContext);
 
   const { theme, setTheme } = useTheme();
@@ -128,11 +128,13 @@ const Navbar = () => {
             <i className="fi fi-rr-search text-xl"></i>
           </button>
 
-          <Link to="/editor" className="hidden md:flex gap-2 link">
-            {/* <i className="fi fi-rr-file-edit"></i> */}
-            <FileEditIcon />
-            <p>Write</p>
-          </Link>
+          {isAdmin && (
+            <Link to="/editor" className="hidden md:flex gap-2 link">
+              {/* <i className="fi fi-rr-file-edit"></i> */}
+              <FileEditIcon />
+              <p>Write</p>
+            </Link>
+          )}
 
           {theme === "light" ? (
             <Button

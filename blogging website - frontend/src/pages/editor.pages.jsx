@@ -51,7 +51,7 @@ const Editor = () => {
   const [loading, setLoading] = useState(true);
 
   let {
-    userAuth: { access_token },
+    userAuth: { access_token, isAdmin },
   } = useContext(UserContext);
 
   //========================================================================================
@@ -85,9 +85,7 @@ const Editor = () => {
 
         setBlog(blog);
         setLoading(false);
-
       } catch (error) {
-
         console.log(error);
         setBlog(null);
         setLoading(false);
@@ -122,7 +120,9 @@ const Editor = () => {
 
   return (
     <EditorContext.Provider value={value}>
-      {access_token === null ? (
+      {!isAdmin ? (
+        <Navigate to="/404" />
+      ) : access_token === null ? (
         <Navigate to="/signin" />
       ) : loading ? (
         <Loader />

@@ -14,12 +14,11 @@ import {
   UserIcon,
 } from "@/Icons";
 import Button from "./button";
-import clsx from "clsx";
 
 const SideNav = () => {
   const {
     userAuth,
-    userAuth: { access_token },
+    userAuth: { access_token, isAdmin },
   } = useContext(UserContext);
 
   const { theme, setTheme } = useTheme();
@@ -247,15 +246,16 @@ const SideNav = () => {
               Notification
             </NavLink>
 
-            <NavLink
-              to="/dashboard/editor"
-              onClick={(event) => setPageState(event.target.innerText)}
-              className={theme === "light" ? "sidebar-link" : "sidebar-link-dark"}
-            >
-              <FileEditIcon />
-              Write
-            </NavLink>
-
+            {isAdmin && (
+              <NavLink
+                to="/editor"
+                onClick={(event) => setPageState(event.target.innerText)}
+                className={theme === "light" ? "sidebar-link" : "sidebar-link-dark"}
+              >
+                <FileEditIcon />
+                Write
+              </NavLink>
+            )}
             {/* -------------------------------------------------------------------------------------- */}
 
             <h1 className="text-xl text-dark-grey mt-20 mb-3">Settings</h1>
